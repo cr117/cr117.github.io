@@ -165,7 +165,36 @@
 		var currentNumber = null;
 		var pastNumbers = [];
 
+		function setCookie(name, value, days) {
+			var expires = "";
+			if (days) {
+				var date = new Date();
+				date.setTime(date.getTime() + (days*24*60*60*1000));
+				expires = "; expires=" + date.toUTCString();
+			}
+			document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+		}
+		function getCookie(name) {
+			var nameEQ = name + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0;i < ca.length;i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1,c.length);
+				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+			return null;
+		}
+
 		$(document).ready(function() {
+
+			var savedNumberMin = getCookie('csbc_number_min');
+			var savedNumberMax = getCookie('csbc_number_max');
+
+			if(savedNumberMin !== null) numberMin = parseInt(savedNumberMin);
+			if(savedNumberMax !== null) numberMax = parseInt(savedNumberMax);
+
+			setCookie('csbc_number_min', numberMin, 30);
+			setCookie('csbc_number_max', numberMax, 30);
 
 			for(var i = 0; i <= 200; i++) {
 				$('#settings-form select[name=min]').append('<option value="' + i + '">' + i + '</option>');
@@ -182,6 +211,8 @@
 				var form = $(this);
 				numberMin = parseInt($('select[name=min]', form).val());
 				numberMax = parseInt($('select[name=max]', form).val());
+				setCookie('csbc_number_min', numberMin, 30);
+				setCookie('csbc_number_max', numberMax, 30);
 				console.log(numberMin, numberMax);
 				return false;
 			});
