@@ -61,11 +61,11 @@
 		<form id="calculator" class="mt-4">
 
 			<div class="mb-3">
-				<div class="row">
+				<div class="row mb-1">
 					<label for="input-volts" class="col-6 col-form-label">Volts</label>
 					<div class="col-6">
 						<div class="input-group">
-							<input type="number" class="form-control trigger-form-submit" id="input-volts" name="volts">
+							<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-volts" name="volts">
 							<span class="input-group-text">V</span>
 						</div>
 					</div>
@@ -74,24 +74,34 @@
 			</div>
 
 			<div class="mb-3">
-				<div class="row">
-					<label for="input-amps" class="col-6 col-form-label">Amps</label>
+				<div class="row mb-1">
+					<div class="col-6">
+						<div class="btn-group">
+							<button type="button" class="btn btn-secondary" data-input-toggle="amps">Amps</button>
+							<button type="button" class="btn btn-outline-secondary" data-input-toggle="watts">Watts</button>
+						</div>
+					</div>
 					<div class="col-6">
 						<div class="input-group">
-							<input type="number" class="form-control trigger-form-submit" id="input-amps" name="amps">
+							<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-amps" name="amps">
 							<span class="input-group-text">A</span>
+						</div>
+						<div class="input-group" style="display: none;">
+							<input type="number" inputmode="decimal" class="form-control" id="input-watts" name="watts">
+							<span class="input-group-text">W</span>
 						</div>
 					</div>
 				</div>
 				<input type="range" class="form-range" id="range-amps" min="1" max="300" step="1">
+				<input type="range" class="form-range" id="range-watts" min="1" max="2000" step="1" style="display: none;">
 			</div>
 
 			<div class="mb-3">
-				<div class="row">
+				<div class="row mb-1">
 					<label for="input-distance" class="col-6 col-form-label">Distance <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-title="Distance is determined by round trip circuit, from positive to negative terminal."></i></label>
 					<div class="col-6">
 						<div class="input-group">
-							<input type="number" class="form-control trigger-form-submit" id="input-distance" name="distance">
+							<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-distance" name="distance">
 							<span class="input-group-text">ft</span>
 						</div>
 					</div>
@@ -182,25 +192,58 @@
 			var initialValues = {
 				volts: 12,
 				amps: 10,
-				distance: 30
+				distance: 30,
+				wattsMode: false
 			};
 
 			var volts = getQueryParam('volts');
-			if(volts !== null) initialValues.volts = volts;
+			if(volts !== null) initialValues.volts = parseFloat(volts);
 
 			var amps = getQueryParam('amps');
-			if(amps !== null) initialValues.amps = amps;
+			if(amps !== null) initialValues.amps = parseFloat(amps);
 
 			var distance = getQueryParam('distance');
-			if(distance !== null) initialValues.distance = distance;
+			if(distance !== null) initialValues.distance = parseFloat(distance);
 
-			if($('#input-volts').val() == '') $('#input-volts, #range-volts').val(initialValues.volts);
-			if($('#input-amps').val() == '') $('#input-amps, #range-amps').val(initialValues.amps);
-			if($('#input-distance').val() == '') $('#input-distance, #range-distance').val(initialValues.distance);
+			var wattsMode = getQueryParam('wattsMode');
+			if(wattsMode !== null) initialValues.wattsMode = parseInt(wattsMode);
+
+			$('#input-volts, #range-volts').val(initialValues.volts);
+			$('#input-amps, #range-amps').val(initialValues.amps);
+			$('#input-watts, #range-watts').val(initialValues.amps * initialValues.volts);
+			$('#input-distance, #range-distance').val(initialValues.distance);
+
+			$('button[data-input-toggle]').on('click', function(e) {
+				if($(this).hasClass('btn-secondary')) return;
+				$(this).removeClass('btn-outline-secondary').addClass('btn-secondary');
+				$(this).siblings().each(function(i, el) {
+					$(el).removeClass('btn-secondary').addClass('btn-outline-secondary');
+					var input = $(this).data('input-toggle');
+					$('#input-' + input).closest('.input-group').hide();
+					$('#range-' + input).hide();
+				});
+				var input = $(this).data('input-toggle');
+				$('#input-' + input).closest('.input-group').show();
+				$('#range-' + input).css('display', 'inline-block');
+			}).on('click', _.debounce(updateQueryParams, 100));
+
+			if(initialValues.wattsMode) $('button[data-input-toggle=watts]').trigger('click');
 
 			$('#range-volts').on('change input', function(e) { $('#input-volts').val($(this).val()).trigger('change'); });
 			$('#range-amps').on('change input', function(e) { $('#input-amps').val($(this).val()).trigger('change'); });
+			$('#range-watts').on('change input', function(e) { $('#input-watts').val($(this).val()).trigger('change'); });
 			$('#range-distance').on('change input', function(e) { $('#input-distance').val($(this).val()).trigger('change'); });
+
+			$('#input-volts, #input-amps').on('change keyup', function(e) {
+				var volts = parseFloat($('#input-volts').val());
+				var amps = parseFloat($('#input-amps').val());
+				$('#input-watts').val(volts * amps);
+			});
+			$('#input-watts').on('change keyup', function(e) {
+				var volts = parseFloat($('#input-volts').val());
+				var watts = parseFloat($('#input-watts').val());
+				$('#input-amps').val((watts / volts).toFixed(0)).trigger('change');
+			});
 
 			$('#calculator input.trigger-form-submit').on('change keyup', function(e) { $(this).closest('form').trigger('submit'); });
 
@@ -208,9 +251,11 @@
 				e.preventDefault();
 				var volts = parseFloat($('#input-volts').val());
 				var amps = parseFloat($('#input-amps').val());
+				var watts = parseFloat($('#input-watts').val());
 				var distance = parseFloat($('#input-distance').val());
 				$('#range-volts').val(volts);
 				$('#range-amps').val(amps);
+				$('#range-watts').val(watts);
 				$('#range-distance').val(distance);
 				var cMils = getCMils(volts, amps, distance);
 				var wireArea = getWireArea(volts, amps, distance);
@@ -243,9 +288,11 @@
 			var volts = parseFloat($('#input-volts').val());
 			var amps = parseFloat($('#input-amps').val());
 			var distance = parseFloat($('#input-distance').val());
+			var wattsMode = $('button[data-input-toggle=watts]').hasClass('btn-secondary') ? 1 : 0;
 			setQueryParam('volts', volts);
 			setQueryParam('amps', amps);
 			setQueryParam('distance', distance);
+			setQueryParam('wattsMode', wattsMode);
 		}
 
 		function getCMils(volts, amps, distance, voltageDropPercent, kResFactor) {
