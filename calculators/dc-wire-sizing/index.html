@@ -17,8 +17,12 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 	<style>
-		body {
+		#main {
 			padding: 20px;
+		}
+		.navbar-icon-btn {
+			--bs-btn-padding-x: 0.375rem;
+			border-color: transparent !important;
 		}
 		#calculator {
 			max-width: 400px;
@@ -37,126 +41,162 @@
 	
 	<div id="page">
 
-		<h1 class="text-center">DC Wire Sizing Calculator <i class="bi bi-info-circle text-primary" style="font-size: 1rem; cursor: pointer; vertical-align: middle;" data-bs-toggle="modal" data-bs-target="#description-modal"></i></h1>
+		<nav class="navbar bg-body-tertiary">
+			<div class="container-fluid">
 
-		<div id="description-modal" class="modal fade">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="exampleModalLabel">About the Calculator</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<a class="navbar-brand">DC Wire Sizing Calculator</a>
+
+				<div class="d-flex">
+					<button type="button" class="btn navbar-icon-btn" data-bs-toggle="modal" data-bs-target="#description-modal">
+						<i class="bi bi-info-circle"></i>
+					</button>
+					<!-- <button type="button" class="btn navbar-icon-btn" data-bs-toggle="offcanvas" data-bs-target="#navbar-offcanvas" aria-controls="#navbar-offcanvas" aria-label="Toggle navigation">
+						<i class="bi bi-three-dots-vertical"></i>
+					</button> -->
+				</div>
+				
+				<div class="offcanvas offcanvas-end" tabindex="-1" id="navbar-offcanvas" aria-labelledby="navbar-offcanvas-label">
+					<div class="offcanvas-header">
+						<!-- <h5 class="offcanvas-title" id="navbar-offcanvas-label">Options</h5> -->
+						<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 					</div>
-					<div class="modal-body">
-						<div class="alert alert-warning d-flex">
-							<i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
-							<div>This calculator is for DC circuits only and is NOT to be used to size 120V or 240V AC circuits.</div>
+					<div class="offcanvas-body d-flex flex-column">
+						<div class="flex-grow-1">
+							
 						</div>
-						<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided.</p>
-						<p>Always use high-quality pure copper stranded wire with at least a 105° C temperature rating.</p>
+						<div class="mt-3">
+							<a href="../" class="btn btn-light">View All Calculators</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</nav>
+
+		<div id="main">
+
+			<div id="description-modal" class="modal fade">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">Important Notes</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="alert alert-warning d-flex">
+								<i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
+								<div>This calculator is for DC circuits only. <strong>Do not</strong> use this to size 120V or 240V AC circuits.</div>
+							</div>
+							<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided.</p>
+							<p>Always use high-quality pure copper stranded wire.</p>
+							<p>Calculations are based on a maxiumum of 3% voltage drop over the entire length of the circuit.</p>
+						</div>
 					</div>
 				</div>
 			</div>
+			
+			<form id="calculator">
+
+				<div class="mb-3">
+					<div class="row mb-1">
+						<label for="input-volts" class="col-6 col-form-label">Volts</label>
+						<div class="col-6">
+							<div class="input-group">
+								<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-volts" name="volts">
+								<span class="input-group-text">V</span>
+							</div>
+						</div>
+					</div>
+					<input type="range" class="form-range" id="range-volts" min="1" max="48" step="1">
+				</div>
+
+				<div class="mb-3">
+					<div class="row mb-1">
+						<div class="col-6">
+							<div class="btn-group">
+								<button type="button" class="btn btn-secondary" data-input-toggle="amps">Amps</button>
+								<button type="button" class="btn btn-outline-secondary" data-input-toggle="watts">Watts</button>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="input-group">
+								<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-amps" name="amps">
+								<span class="input-group-text">A</span>
+							</div>
+							<div class="input-group" style="display: none;">
+								<input type="number" inputmode="decimal" class="form-control" id="input-watts" name="watts">
+								<span class="input-group-text">W</span>
+							</div>
+						</div>
+					</div>
+					<input type="range" class="form-range" id="range-amps" min="1" max="300" step="1">
+					<input type="range" class="form-range" id="range-watts" min="1" max="2000" step="1" style="display: none;">
+				</div>
+
+				<div class="mb-3">
+					<div class="row mb-1">
+						<label for="input-distance" class="col-6 col-form-label">Distance <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-title="Distance is determined by round trip circuit, from positive to negative terminal."></i></label>
+						<div class="col-6">
+							<div class="input-group">
+								<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-distance" name="distance">
+								<span class="input-group-text">ft</span>
+							</div>
+						</div>
+					</div>
+					<input type="range" class="form-range" id="range-distance" min="1" max="50" step="1">
+				</div>
+
+				<div class="d-none"><button type="submit" class="btn btn-primary">Submit</button></div>
+
+				<div class="d-none mb-3">
+					<label for="input-cmils" class="form-label">Circular Mils</label>
+					<div class="input-group">
+						<input type="number" class="form-control" id="input-cmils" name="cmils" disabled readonly>
+						<span class="input-group-text">cmil</span>
+					</div>
+				</div>
+
+				<div class="d-none mb-3">
+					<label for="input-wirearea" class="form-label">Wire Cross Section Area</label>
+					<div class="input-group">
+						<input type="number" class="form-control" id="input-wirearea" name="wirearea" disabled readonly>
+						<span class="input-group-text">mm<sup>2</sup></span>
+					</div>
+				</div>
+
+				<div class="d-none mb-3">
+					<label for="input-wiregauge" class="form-label">Wire Gauge</label>
+					<div class="input-group">
+						<input type="text" class="form-control" id="input-wiregauge" name="wiregauge" disabled readonly>
+						<span class="input-group-text">AWG</span>
+					</div>
+				</div>
+
+				<div class="card text-bg-light text-center mt-4 output-container" style="display: none;">
+					<!-- <div class="card-header">Results</div> -->
+					<div class="card-body">
+						<p class="card-text"><span id="output-wiregauge"></span> <span class="units">AWG</span></p>
+					</div>
+					<div class="card-footer text-body-secondary">
+						<span id="output-wirearea"></span> <span class="units">mm<sup>2</sup></span>
+					</div>
+				</div>
+
+				<div class="output-container text-center mt-2 fs-4" style="display: none;">
+					<span class="badge text-bg-secondary d-inline-flex align-items-center" data-bs-toggle="tooltip" data-bs-title="Recommended fuse size based on circuit's amps and wire's max capacity.">
+						<svg width="30px" height="20px" version="1.1" viewBox="0 200 1200 800" xmlns="http://www.w3.org/2000/svg" class="me-2" style="fill: currentColor;">
+							<path d="m1161.5 572.31h-186.98c-12.129-43.422-51.949-75.379-99.195-75.379-23.629 0-45.379 8.0859-62.77 21.527-21.34-53.316-63.305-88.836-112.62-88.836-71.59-0.003906-127.68 74.82-127.68 170.38 0 62.344-33.102 115-72.312 115-39.211 0-72.312-52.672-72.312-115 0-56.844-46.246-103.07-103.07-103.07-47.242 0-87.047 31.977-99.195 75.379h-186.96c-15.305 0-27.691 12.387-27.691 27.691s12.387 27.691 27.691 27.691h186.96c12.148 43.422 51.949 75.398 99.195 75.398 23.629 0 45.379-8.0859 62.789-21.527 21.34 53.336 63.285 88.836 112.6 88.836 71.594 0 127.68-74.824 127.7-170.36 0-62.344 33.102-115.02 72.297-115.02 39.195 0 72.312 52.672 72.312 115.02v0.019532c0.035156 56.844 46.266 103.05 103.07 103.05 47.242 0 87.066-31.977 99.195-75.398h186.98c15.285 0 27.691-12.387 27.691-27.691 0-15.301-12.406-27.707-27.695-27.707zm-836.93 75.395c-26.289 0-47.688-21.395-47.688-47.703 0-26.289 21.398-47.688 47.688-47.688s47.688 21.398 47.688 47.688c0.015625 26.309-21.379 47.703-47.688 47.703zm550.76 0c-26.289 0-47.688-21.398-47.688-47.703 0-26.289 21.398-47.688 47.688-47.688 26.309 0 47.703 21.398 47.703 47.688 0.003906 26.309-21.395 47.703-47.703 47.703z"/>
+						</svg>
+						<span>
+							<span id="output-fusesize"></span> <span class="units">A</span>
+						</span>
+					</span>
+				</div>
+
+			</form>
+
 		</div>
 		
-		<form id="calculator" class="mt-4">
-
-			<div class="mb-3">
-				<div class="row mb-1">
-					<label for="input-volts" class="col-6 col-form-label">Volts</label>
-					<div class="col-6">
-						<div class="input-group">
-							<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-volts" name="volts">
-							<span class="input-group-text">V</span>
-						</div>
-					</div>
-				</div>
-				<input type="range" class="form-range" id="range-volts" min="1" max="48" step="1">
-			</div>
-
-			<div class="mb-3">
-				<div class="row mb-1">
-					<div class="col-6">
-						<div class="btn-group">
-							<button type="button" class="btn btn-secondary" data-input-toggle="amps">Amps</button>
-							<button type="button" class="btn btn-outline-secondary" data-input-toggle="watts">Watts</button>
-						</div>
-					</div>
-					<div class="col-6">
-						<div class="input-group">
-							<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-amps" name="amps">
-							<span class="input-group-text">A</span>
-						</div>
-						<div class="input-group" style="display: none;">
-							<input type="number" inputmode="decimal" class="form-control" id="input-watts" name="watts">
-							<span class="input-group-text">W</span>
-						</div>
-					</div>
-				</div>
-				<input type="range" class="form-range" id="range-amps" min="1" max="300" step="1">
-				<input type="range" class="form-range" id="range-watts" min="1" max="2000" step="1" style="display: none;">
-			</div>
-
-			<div class="mb-3">
-				<div class="row mb-1">
-					<label for="input-distance" class="col-6 col-form-label">Distance <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-title="Distance is determined by round trip circuit, from positive to negative terminal."></i></label>
-					<div class="col-6">
-						<div class="input-group">
-							<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-distance" name="distance">
-							<span class="input-group-text">ft</span>
-						</div>
-					</div>
-				</div>
-				<input type="range" class="form-range" id="range-distance" min="1" max="50" step="1">
-			</div>
-
-			<div class="d-none"><button type="submit" class="btn btn-primary">Submit</button></div>
-
-			<div class="d-none mb-3">
-				<label for="input-cmils" class="form-label">Circular Mils</label>
-				<div class="input-group">
-					<input type="number" class="form-control" id="input-cmils" name="cmils" disabled readonly>
-					<span class="input-group-text">cmil</span>
-				</div>
-			</div>
-
-			<div class="d-none mb-3">
-				<label for="input-wirearea" class="form-label">Wire Cross Section Area</label>
-				<div class="input-group">
-					<input type="number" class="form-control" id="input-wirearea" name="wirearea" disabled readonly>
-					<span class="input-group-text">mm<sup>2</sup></span>
-				</div>
-			</div>
-
-			<div class="d-none mb-3">
-				<label for="input-wiregauge" class="form-label">Wire Gauge</label>
-				<div class="input-group">
-					<input type="text" class="form-control" id="input-wiregauge" name="wiregauge" disabled readonly>
-					<span class="input-group-text">AWG</span>
-				</div>
-			</div>
-
-			<div class="card text-bg-light text-center mt-4 output-container" style="display: none;">
-				<!-- <div class="card-header">Results</div> -->
-				<div class="card-body">
-					<p class="card-text"><span id="output-wiregauge"></span> <span class="units">AWG</span></p>
-				</div>
-				<div class="card-footer text-body-secondary">
-					<span id="output-wirearea"></span> <span class="units">mm<sup>2</sup></span>
-				</div>
-			</div>
-
-			<div class="output-container text-center mt-2 fs-4" style="display: none;">
-				<span class="badge text-bg-secondary d-inline-flex align-items-center" data-bs-toggle="tooltip" data-bs-title="Recommended fuse size based on circuit's amps and wire's max capacity.">
-					<svg width="30px" height="20px" version="1.1" viewBox="0 200 1200 800" xmlns="http://www.w3.org/2000/svg" class="me-2" style="fill: currentColor;">
-						<path d="m1161.5 572.31h-186.98c-12.129-43.422-51.949-75.379-99.195-75.379-23.629 0-45.379 8.0859-62.77 21.527-21.34-53.316-63.305-88.836-112.62-88.836-71.59-0.003906-127.68 74.82-127.68 170.38 0 62.344-33.102 115-72.312 115-39.211 0-72.312-52.672-72.312-115 0-56.844-46.246-103.07-103.07-103.07-47.242 0-87.047 31.977-99.195 75.379h-186.96c-15.305 0-27.691 12.387-27.691 27.691s12.387 27.691 27.691 27.691h186.96c12.148 43.422 51.949 75.398 99.195 75.398 23.629 0 45.379-8.0859 62.789-21.527 21.34 53.336 63.285 88.836 112.6 88.836 71.594 0 127.68-74.824 127.7-170.36 0-62.344 33.102-115.02 72.297-115.02 39.195 0 72.312 52.672 72.312 115.02v0.019532c0.035156 56.844 46.266 103.05 103.07 103.05 47.242 0 87.066-31.977 99.195-75.398h186.98c15.285 0 27.691-12.387 27.691-27.691 0-15.301-12.406-27.707-27.695-27.707zm-836.93 75.395c-26.289 0-47.688-21.395-47.688-47.703 0-26.289 21.398-47.688 47.688-47.688s47.688 21.398 47.688 47.688c0.015625 26.309-21.379 47.703-47.688 47.703zm550.76 0c-26.289 0-47.688-21.398-47.688-47.703 0-26.289 21.398-47.688 47.688-47.688 26.309 0 47.703 21.398 47.703 47.688 0.003906 26.309-21.395 47.703-47.703 47.703z"/>
-					</svg>
-					<span>
-						<span id="output-fusesize"></span> <span class="units">A</span>
-					</span>
-				</span>
-			</div>
-
-		</form>
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
