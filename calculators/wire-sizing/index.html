@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	
+	<meta name="robots" content="noindex,follow">
+
+	<title>Wire Sizing Calculator</title>
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+	<style>
+		body {
+			padding: 20px;
+		}
+		#page {
+			max-width: 400px;
+			margin: 0 auto;
+		}
+		#output-wiregauge {
+			display: block;
+			font-size: 40px;
+			line-height: 1.1;
+			font-weight: 700;
+		}
+	</style>
+
+</head>
+<body>
+	
+	<div id="page">
+
+		<h1 class="text-center">Wire Sizing Calculator <i class="bi bi-info-circle text-primary" style="font-size: 1rem; cursor: pointer; vertical-align: middle;" data-bs-toggle="modal" data-bs-target="#description-modal"></i></h1>
+
+		<div id="description-modal" class="modal fade">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="exampleModalLabel">About the Calculator</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-warning d-flex">
+							<i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
+							<div>This calculator is for DC circuits only and is NOT to be used to size 120V or 240V AC circuits.</div>
+						</div>
+						<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided.</p>
+						<p>Always use high-quality pure copper stranded wire with at least a 105° C temperature rating.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<form id="calculator" class="mt-4">
+
+			<div class="mb-3">
+				<div class="row">
+					<label for="input-volts" class="col-6 col-form-label">Volts</label>
+					<div class="col-6">
+						<div class="input-group">
+							<input type="number" class="form-control trigger-form-submit" id="input-volts" name="volts">
+							<span class="input-group-text">V</span>
+						</div>
+					</div>
+				</div>
+				<input type="range" class="form-range" id="range-volts" min="1" max="48" step="1">
+			</div>
+
+			<div class="mb-3">
+				<div class="row">
+					<label for="input-amps" class="col-6 col-form-label">Amps</label>
+					<div class="col-6">
+						<div class="input-group">
+							<input type="number" class="form-control trigger-form-submit" id="input-amps" name="amps">
+							<span class="input-group-text">A</span>
+						</div>
+					</div>
+				</div>
+				<input type="range" class="form-range" id="range-amps" min="1" max="300" step="1">
+			</div>
+
+			<div class="mb-3">
+				<div class="row">
+					<label for="input-distance" class="col-6 col-form-label">Distance <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-title="Distance is determined by round trip circuit, from positive to negative terminal."></i></label>
+					<div class="col-6">
+						<div class="input-group">
+							<input type="number" class="form-control trigger-form-submit" id="input-distance" name="distance">
+							<span class="input-group-text">ft</span>
+						</div>
+					</div>
+				</div>
+				<input type="range" class="form-range" id="range-distance" min="1" max="50" step="1">
+			</div>
+
+			<div class="d-none"><button type="submit" class="btn btn-primary">Submit</button></div>
+
+			<div class="d-none mb-3">
+				<label for="input-cmils" class="form-label">Circular Mils</label>
+				<div class="input-group">
+					<input type="number" class="form-control" id="input-cmils" name="cmils" disabled readonly>
+					<span class="input-group-text">cmil</span>
+				</div>
+			</div>
+
+			<div class="d-none mb-3">
+				<label for="input-wirearea" class="form-label">Wire Cross Section Area</label>
+				<div class="input-group">
+					<input type="number" class="form-control" id="input-wirearea" name="wirearea" disabled readonly>
+					<span class="input-group-text">mm<sup>2</sup></span>
+				</div>
+			</div>
+
+			<div class="d-none mb-3">
+				<label for="input-wiregauge" class="form-label">Wire Gauge</label>
+				<div class="input-group">
+					<input type="text" class="form-control" id="input-wiregauge" name="wiregauge" disabled readonly>
+					<span class="input-group-text">AWG</span>
+				</div>
+			</div>
+
+			<div class="card text-bg-light text-center mt-4 output-container" style="display: none;">
+				<!-- <div class="card-header">Results</div> -->
+				<div class="card-body">
+					<p class="card-text"><span id="output-wiregauge"></span> <span class="units">AWG</span></p>
+				</div>
+				<div class="card-footer text-body-secondary">
+					<span id="output-wirearea"></span> <span class="units">mm<sup>2</sup></span>
+				</div>
+			</div>
+
+			<div class="output-container text-center mt-2 fs-4" style="display: none;">
+				<span class="badge text-bg-secondary d-inline-flex align-items-center" data-bs-toggle="tooltip" data-bs-title="Recommended fuse size based on circuit's amps and wire's max capacity.">
+					<svg width="30px" height="20px" version="1.1" viewBox="0 200 1200 800" xmlns="http://www.w3.org/2000/svg" class="me-2" style="fill: currentColor;">
+						<path d="m1161.5 572.31h-186.98c-12.129-43.422-51.949-75.379-99.195-75.379-23.629 0-45.379 8.0859-62.77 21.527-21.34-53.316-63.305-88.836-112.62-88.836-71.59-0.003906-127.68 74.82-127.68 170.38 0 62.344-33.102 115-72.312 115-39.211 0-72.312-52.672-72.312-115 0-56.844-46.246-103.07-103.07-103.07-47.242 0-87.047 31.977-99.195 75.379h-186.96c-15.305 0-27.691 12.387-27.691 27.691s12.387 27.691 27.691 27.691h186.96c12.148 43.422 51.949 75.398 99.195 75.398 23.629 0 45.379-8.0859 62.789-21.527 21.34 53.336 63.285 88.836 112.6 88.836 71.594 0 127.68-74.824 127.7-170.36 0-62.344 33.102-115.02 72.297-115.02 39.195 0 72.312 52.672 72.312 115.02v0.019532c0.035156 56.844 46.266 103.05 103.07 103.05 47.242 0 87.066-31.977 99.195-75.398h186.98c15.285 0 27.691-12.387 27.691-27.691 0-15.301-12.406-27.707-27.695-27.707zm-836.93 75.395c-26.289 0-47.688-21.395-47.688-47.703 0-26.289 21.398-47.688 47.688-47.688s47.688 21.398 47.688 47.688c0.015625 26.309-21.379 47.703-47.688 47.703zm550.76 0c-26.289 0-47.688-21.398-47.688-47.703 0-26.289 21.398-47.688 47.688-47.688 26.309 0 47.703 21.398 47.703 47.688 0.003906 26.309-21.395 47.703-47.703 47.703z"/>
+					</svg>
+					<span>
+						<span id="output-fusesize"></span> <span class="units">A</span>
+					</span>
+				</span>
+			</div>
+
+		</form>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+	<script>
+
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+
+		var gaugeMap = [
+			{ label: '18', area: 0.8230, amps: 20 },
+			{ label: '16', area: 1.308, amps: 25 },
+			{ label: '14', area: 2.0809, amps: 35 },
+			{ label: '12', area: 3.3088, amps: 45 },
+			{ label: '10', area: 5.2612, amps: 60 },
+			{ label: '8', area: 8.3656, amps: 80 },
+			{ label: '6', area: 13.3018, amps: 120 },
+			{ label: '4', area: 21.1506, amps: 160 },
+			{ label: '2', area: 33.6308, amps: 220 },
+			{ label: '1', area: 42.4077, amps: 245 },
+			{ label: '1/0', area: 53.4751, amps: 285 },
+			{ label: '2/0', area: 67.4309, amps: 330 },
+			{ label: '3/0', area: 85.0288, amps: 385 },
+			{ label: '4/0', area: 107.2193, amps: 445 }
+		];
+
+
+		$(document).ready(function() {
+
+			var initialValues = {
+				volts: 12,
+				amps: 10,
+				distance: 30
+			};
+
+			var volts = getQueryParam('volts');
+			if(volts !== null) initialValues.volts = volts;
+
+			var amps = getQueryParam('amps');
+			if(amps !== null) initialValues.amps = amps;
+
+			var distance = getQueryParam('distance');
+			if(distance !== null) initialValues.distance = distance;
+
+			if($('#input-volts').val() == '') $('#input-volts, #range-volts').val(initialValues.volts);
+			if($('#input-amps').val() == '') $('#input-amps, #range-amps').val(initialValues.amps);
+			if($('#input-distance').val() == '') $('#input-distance, #range-distance').val(initialValues.distance);
+
+			$('#range-volts').on('change input', function(e) { $('#input-volts').val($(this).val()).trigger('change'); });
+			$('#range-amps').on('change input', function(e) { $('#input-amps').val($(this).val()).trigger('change'); });
+			$('#range-distance').on('change input', function(e) { $('#input-distance').val($(this).val()).trigger('change'); });
+
+			$('#calculator input.trigger-form-submit').on('change keyup', function(e) { $(this).closest('form').trigger('submit'); });
+
+			$('#calculator').on('submit', function(e) {
+				e.preventDefault();
+				var volts = parseFloat($('#input-volts').val());
+				var amps = parseFloat($('#input-amps').val());
+				var distance = parseFloat($('#input-distance').val());
+				$('#range-volts').val(volts);
+				$('#range-amps').val(amps);
+				$('#range-distance').val(distance);
+				var cMils = getCMils(volts, amps, distance);
+				var wireArea = getWireArea(volts, amps, distance);
+				var wireGauge = getWireGauge(wireArea, amps);
+				var fuseSize = getFuseSize(wireGauge, amps);
+				if(isNaN(wireArea)) return false;
+				if(wireGauge === null) {
+					wireGauge = 'Max Current Exceeded';
+					$('#output-wiregauge').next('.units').hide();
+					$('#output-fusesize').text('').closest('.output-container').hide();
+				} else {
+					$('#output-wiregauge').next('.units').show();
+					$('#output-fusesize').text(fuseSize.toFixed(0)).closest('.output-container').show();
+				}
+				$('#input-cmils').val(cMils.toFixed(2));
+				$('#input-wirearea').val(wireArea.toFixed(2));
+				$('#input-wiregauge').val(wireGauge);
+				$('#output-wirearea').text(wireArea.toFixed(2));
+				$('#output-wiregauge').text(wireGauge);
+				$('#output-wiregauge').closest('.output-container').show();
+				$(this).trigger('updateQueryParams');
+				return false;
+			}).on('updateQueryParams', _.debounce(updateQueryParams, 100));
+
+			$('#calculator').trigger('submit');
+
+		});
+
+		function updateQueryParams() {
+			var volts = parseFloat($('#input-volts').val());
+			var amps = parseFloat($('#input-amps').val());
+			var distance = parseFloat($('#input-distance').val());
+			setQueryParam('volts', volts);
+			setQueryParam('amps', amps);
+			setQueryParam('distance', distance);
+		}
+
+		function getCMils(volts, amps, distance, voltageDropPercent, kResFactor) {
+			voltageDropPercent = typeof voltageDropPercent !== 'undefined' ? voltageDropPercent : 3; // critical = 3, non-critical = 10
+			kResFactor = typeof kResFactor !== 'undefined' ? kResFactor : 10.75; // copper = 10.75
+			var voltageDrop = volts * (voltageDropPercent / 100);
+			return (kResFactor * amps * distance) / voltageDrop;
+		}
+
+		function getWireArea(volts, amps, distance, voltageDropPercent, kResFactor) {
+			var cMils = getCMils(volts, amps, distance, voltageDropPercent, kResFactor);
+			return cMils * 0.0005067075;
+		}
+
+		function getWireGauge(area, amps) {
+			for(var i in gaugeMap) {
+				if(area <= gaugeMap[i].area && amps <= gaugeMap[i].amps) {
+					return gaugeMap[i].label;
+				}
+			}
+			return null;
+		}
+
+		function getFuseSize(wireGauge, amps) {
+			var size = Math.max(1, amps * 1.2);
+			for(var i in gaugeMap) {
+				if(wireGauge == gaugeMap[i].label) {
+					return Math.min(size, gaugeMap[i].amps * 1.5);
+				}
+			}
+			return null;
+		}
+
+
+
+		function generateRandomNumber(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		function setCookie(name, value, days) {
+			var expires = "";
+			if (days) {
+				var date = new Date();
+				date.setTime(date.getTime() + (days*24*60*60*1000));
+				expires = "; expires=" + date.toUTCString();
+			}
+			document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+		}
+		function getCookie(name) {
+			var nameEQ = name + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0;i < ca.length;i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1,c.length);
+				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+			return null;
+		}
+		function setQueryParam(name, value) {
+			if('URLSearchParams' in window && history.pushState != null) {
+				var url = new URL(window.location);
+				url.searchParams.set(name, value);
+				history.pushState(null, '', url);
+			}
+		}
+		function getQueryParam(name) {
+			if('URLSearchParams' in window) {
+				var queryParams = new URLSearchParams(window.location.search);
+				return queryParams.get(name);
+			}
+		}
+
+	</script>
+
+</body>
+</html>
