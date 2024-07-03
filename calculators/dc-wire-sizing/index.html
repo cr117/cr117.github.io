@@ -234,7 +234,8 @@
 			$('#range-watts').on('change input', function(e) { $('#input-watts').val($(this).val()).trigger('change'); });
 			$('#range-distance').on('change input', function(e) { $('#input-distance').val($(this).val()).trigger('change'); });
 
-			$('#input-volts, #input-amps').on('change keyup', function(e) {
+			$('#input-volts, #input-amps').on('change keyup', function(e, recalculateWatts) {
+				if(recalculateWatts === false) return;
 				var volts = parseFloat($('#input-volts').val());
 				var amps = parseFloat($('#input-amps').val());
 				$('#input-watts').val(volts * amps);
@@ -242,7 +243,7 @@
 			$('#input-watts').on('change keyup', function(e) {
 				var volts = parseFloat($('#input-volts').val());
 				var watts = parseFloat($('#input-watts').val());
-				$('#input-amps').val((watts / volts).toFixed(0)).trigger('change');
+				$('#input-amps').val((watts / volts).toFixed(2)).trigger('change', false);
 			});
 
 			$('#calculator input.trigger-form-submit').on('change keyup', function(e) { $(this).closest('form').trigger('submit'); });
