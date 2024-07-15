@@ -92,9 +92,17 @@
 								<i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
 								<div>This calculator is for DC circuits only. <strong>Do not</strong> use this to size 120V or 240V AC circuits.</div>
 							</div>
-							<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided.</p>
-							<p>Always use high-quality pure copper stranded wire.</p>
-							<p>Calculations are based on a maxiumum of 3% voltage drop over the entire length of the circuit.</p>
+							<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided and use high-quality pure copper stranded wire.</p>
+							<p>Wire size is calculated using the following equation:</p>
+							<p><img src="/calculators/dc-wire-sizing/formula.png" alt="Formula"></p>
+							<p>Where...</p>
+							<ul>
+								<li><em>A<sub>cmil</sub></em> = The area of the wire's cross section measured in circular mils.</li>
+								<li><em>K</em> = The resistance factor of the conductor in mil feet (for copper, this is 10.75).</li>
+								<li><em>I</em> = The current running through the wire in amps.</li>
+								<li><em>L</em> = The length of the wire's circuit in feet.</li>
+								<li><em>V<sub>drop</sub></em> = The maximum allowable voltage drop in volts (this calculator uses a 3% voltage drop).</li>
+							</ul>
 						</div>
 					</div>
 				</div>
