@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	
+	<meta name="robots" content="noindex,follow">
+
+	<title>Auxiliary Battery Simulator</title>
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+	<style>
+		#main {
+			padding: 20px;
+		}
+		.navbar-icon-btn {
+			--bs-btn-padding-x: 0.375rem;
+			border-color: transparent !important;
+		}
+		
+		.card-container {
+			margin: 0 auto;
+			max-width: 1000px;
+		}
+	</style>
+
+</head>
+<body>
+	
+	<div id="page">
+
+		<nav class="navbar bg-body-tertiary">
+			<div class="container-fluid">
+
+				<a class="navbar-brand">Calculators</a>
+
+				<div class="d-flex">
+					<!-- <button type="button" class="btn navbar-icon-btn" data-bs-toggle="modal" data-bs-target="#description-modal">
+						<i class="bi bi-info-circle"></i>
+					</button> -->
+					<button type="button" class="btn navbar-icon-btn" data-bs-toggle="offcanvas" data-bs-target="#navbar-offcanvas" aria-controls="#navbar-offcanvas" aria-label="Toggle navigation">
+						<i class="bi bi-three-dots-vertical"></i>
+					</button>
+				</div>
+				
+				<div class="offcanvas offcanvas-end" tabindex="-1" id="navbar-offcanvas" aria-labelledby="navbar-offcanvas-label">
+					<div class="offcanvas-header">
+						<!-- <h5 class="offcanvas-title" id="navbar-offcanvas-label">Options</h5> -->
+						<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+					</div>
+					<div class="offcanvas-body d-flex flex-column">
+						<div class="flex-grow-1">
+							
+						</div>
+						<div class="mt-3">
+							<a href="/calculators/" class="btn btn-light">View All Calculators</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</nav>
+
+		<div id="main">
+
+			<div id="description-modal" class="modal fade">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">Important Notes</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="alert alert-warning d-flex">
+								<i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
+								<div>This calculator is for DC circuits only. <strong>Do not</strong> use this to size 120V or 240V AC circuits.</div>
+							</div>
+							<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided and use high-quality pure copper stranded wire.</p>
+							<p>Wire size is calculated using the following equation:</p>
+							<p><img src="/calculators/dc-wire-sizing/formula.png" alt="Formula"></p>
+							<p>Where...</p>
+							<ul>
+								<li><em>A<sub>cmil</sub></em> = The area of the wire's cross section measured in circular mils.</li>
+								<li><em>K</em> = The resistance factor of the conductor in mil feet (for copper, this is 10.75).</li>
+								<li><em>I</em> = The current running through the wire in amps.</li>
+								<li><em>L</em> = The length of the wire's circuit in feet.</li>
+								<li><em>V<sub>drop</sub></em> = The maximum allowable voltage drop in volts (this calculator uses a 3% voltage drop).</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="card-container">
+				<div class="row row-cols-1 row-cols-md-2 g-4">
+					<div class="col">
+						<div class="card h-100">
+							<div class="card-body">
+								<h5 class="card-title">DC Wire Sizing Calculator</h5>
+								<p class="card-text">Make sure your DC wires are sized correctly and fused correctly.</p>
+								<a href="/calculators/dc-wire-sizing/" class="btn btn-primary">Open Calculator</a>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="card h-100">
+							<div class="card-body">
+								<h5 class="card-title">Auxiliary Battery Simulator</h5>
+								<p class="card-text">Not sure what size battery/power station you need? Test out different scenarios here.</p>
+								<a href="/calculators/aux-battery-simulator/" class="btn btn-primary">Open Simulator</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+	<script>
+
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+
+
+		$(document).ready(function() {
+
+
+
+		function generateRandomNumber(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		function setCookie(name, value, days) {
+			var expires = "";
+			if (days) {
+				var date = new Date();
+				date.setTime(date.getTime() + (days*24*60*60*1000));
+				expires = "; expires=" + date.toUTCString();
+			}
+			document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+		}
+		function getCookie(name) {
+			var nameEQ = name + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0;i < ca.length;i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1,c.length);
+				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+			return null;
+		}
+		function setQueryParam(name, value) {
+			if('URLSearchParams' in window && history.pushState != null) {
+				var url = new URL(window.location);
+				url.searchParams.set(name, value);
+				history.pushState(null, '', url);
+			}
+		}
+		function getQueryParam(name) {
+			if('URLSearchParams' in window) {
+				var queryParams = new URLSearchParams(window.location.search);
+				return queryParams.get(name);
+			}
+		}
+
+	</script>
+
+</body>
+</html>

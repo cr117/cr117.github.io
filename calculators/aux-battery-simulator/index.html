@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	
+	<meta name="robots" content="noindex,follow">
+
+	<title>Auxiliary Battery Simulator</title>
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+	<style>
+		#main {
+			padding: 20px;
+		}
+		.navbar-icon-btn {
+			--bs-btn-padding-x: 0.375rem;
+			border-color: transparent !important;
+		}
+		#calculator {
+			max-width: 400px;
+			margin: 0 auto;
+		}
+		.output-container.card {
+			max-width: 300px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		#output-wiregauge {
+			display: block;
+			font-size: 40px;
+			line-height: 1.1;
+			font-weight: 700;
+		}
+
+		#input-ah {
+			border-top-left-radius: var(--bs-border-radius);
+			border-bottom-left-radius: var(--bs-border-radius);
+		}
+		.entries.accordion .entry.tpl {
+			display: none;
+		}
+		.entries.accordion .entry.tpl + .entry {
+			border-top: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+			border-top-left-radius: var(--bs-accordion-border-radius);
+			border-top-right-radius: var(--bs-accordion-border-radius);
+		}
+		.entries.accordion .entry.tpl + .entry > .accordion-header .accordion-button {
+			border-top-left-radius: var(--bs-accordion-inner-border-radius);
+			border-top-right-radius: var(--bs-accordion-inner-border-radius);
+		}
+
+		.entries.accordion .entry.disabled > .accordion-header .accordion-button {
+			text-decoration: line-through;
+		}
+
+		.form-floating .form-select.form-select-sm ~ label {
+			padding: 1rem .5rem;
+		}
+
+		.output {
+			position: relative;
+			width: 100vw;
+			padding: 0 20px 40px;
+			left: 50%;
+			transform: translateX(-50%);
+			overflow-x: auto;
+		}
+		.chart-container {
+			position: relative;
+			width: 1000px;
+			height: 500px;
+			margin: 0 auto;
+		}
+		.chart-container > .inner {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+
+</head>
+<body>
+	
+	<div id="page">
+
+		<nav class="navbar bg-body-tertiary">
+			<div class="container-fluid">
+
+				<a class="navbar-brand">Aux Battery Simulator</a>
+
+				<div class="d-flex">
+					<!-- <button type="button" class="btn navbar-icon-btn" data-bs-toggle="modal" data-bs-target="#description-modal">
+						<i class="bi bi-info-circle"></i>
+					</button> -->
+					<button type="button" class="btn navbar-icon-btn" data-bs-toggle="offcanvas" data-bs-target="#navbar-offcanvas" aria-controls="#navbar-offcanvas" aria-label="Toggle navigation">
+						<i class="bi bi-three-dots-vertical"></i>
+					</button>
+				</div>
+				
+				<div class="offcanvas offcanvas-end" tabindex="-1" id="navbar-offcanvas" aria-labelledby="navbar-offcanvas-label">
+					<div class="offcanvas-header">
+						<!-- <h5 class="offcanvas-title" id="navbar-offcanvas-label">Options</h5> -->
+						<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+					</div>
+					<div class="offcanvas-body d-flex flex-column">
+						<div class="flex-grow-1">
+							
+						</div>
+						<div class="mt-3">
+							<a href="/calculators/" class="btn btn-light">View All Calculators</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</nav>
+
+		<div id="main">
+
+			<div id="description-modal" class="modal fade">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">Important Notes</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="alert alert-warning d-flex">
+								<i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
+								<div>This calculator is for DC circuits only. <strong>Do not</strong> use this to size 120V or 240V AC circuits.</div>
+							</div>
+							<p>This calculator provides theoretical calculations and does not take into account every variable present in your environment. Results from this calculator are not meant to supersede manufacturers' recommendations. Always read and follow the manufacturer's recommended wire and fuse sizes when provided and use high-quality pure copper stranded wire.</p>
+							<p>Wire size is calculated using the following equation:</p>
+							<p><img src="/calculators/dc-wire-sizing/formula.png" alt="Formula"></p>
+							<p>Where...</p>
+							<ul>
+								<li><em>A<sub>cmil</sub></em> = The area of the wire's cross section measured in circular mils.</li>
+								<li><em>K</em> = The resistance factor of the conductor in mil feet (for copper, this is 10.75).</li>
+								<li><em>I</em> = The current running through the wire in amps.</li>
+								<li><em>L</em> = The length of the wire's circuit in feet.</li>
+								<li><em>V<sub>drop</sub></em> = The maximum allowable voltage drop in volts (this calculator uses a 3% voltage drop).</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<form id="calculator">
+
+				<div class="mb-3">
+					<div class="row">
+						<label for="input-volts" class="col-6 col-form-label">System Voltage</label>
+						<div class="col-6">
+							<div class="input-group">
+								<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-volts" name="volts">
+								<span class="input-group-text">V</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<div class="row">
+						<label for="input-volts" class="col-6 col-form-label">Battery Capacity</label>
+						<div class="col-6">
+							<div class="input-group">
+								<input type="number" inputmode="decimal" class="form-control trigger-form-submit" id="input-wh" name="wh">
+								<input type="number" inputmode="decimal" class="form-control" id="input-ah" name="ah" style="display: none;">
+								<button class="btn btn-secondary" type="button" data-input-toggle="wh">Wh</button>
+								<button class="btn btn-outline-secondary" type="button" data-input-toggle="ah">Ah</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<hr>
+
+				<fieldset class="mb-4">
+					<legend>Power Sources</legend>
+					<div class="entries accordion mb-2" id="entries-power-sources">
+
+						<div class="entry tpl accordion-item">
+							<h2 class="accordion-header">
+								<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#entry-tpl">
+									Power Source Device
+								</button>
+							</h2>
+							<div id="entry-tpl" class="accordion-collapse collapse">
+								<div class="accordion-body">
+
+									<div class="form-floating mb-3">
+										<input type="text" class="form-control trigger-form-submit input-name" name="name" id="input-name" placeholder="Device Name">
+										<label for="input-name">Device Name</label>
+									</div>
+
+									<div class="row mb-3 align-items-center justify-content-between">
+										<div class="col-8">
+											<select class="form-select trigger-form-submit" name="type" id="input-type">
+												<option value="" selected>Power Source Type</option>
+												<option value="solar">Solar</option>
+												<option value="dc-dc">DC-DC Charger</option>
+												<option value="ac">AC Charger</option>
+												<option value="other">Other</option>
+											</select>
+										</div>
+										<div class="col-auto">
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-active" type="checkbox" value="1" id="input-active" name="active" checked>
+												<label class="form-check-label" for="input-active">Active</label>
+											</div>
+										</div>
+									</div>
+
+									<div class="row mb-3">
+										<div class="col-6">
+											<input type="hidden" id="input-mode" name="mode" value="watts" class="input-mode">
+											<div class="btn-group d-flex">
+												<button type="button" class="btn btn-secondary" data-input-toggle="watts">Watts</button>
+												<button type="button" class="btn btn-outline-secondary" data-input-toggle="amps">Amps</button>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="input-group">
+												<input type="number" inputmode="decimal" class="form-control trigger-form-submit input-watts" id="input-watts" name="watts">
+												<span class="input-group-text">W</span>
+											</div>
+											<div class="input-group" style="display: none;">
+												<input type="number" inputmode="decimal" class="form-control input-amps" id="input-amps" name="amps">
+												<span class="input-group-text">A</span>
+											</div>
+										</div>
+									</div>
+
+									<div class="row mb-2">
+										<div class="col-6">
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="constant" id="input-application-constant" checked>
+												<label class="form-check-label" for="input-application-constant">Constant supply</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="variable" id="input-application-variable">
+												<label class="form-check-label" for="input-application-variable">Specific times</label>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="row g-1">
+												<div class="col-6">
+													<div class="form-floating">
+														<select class="form-select form-select-sm trigger-form-submit" id="input-starttime" name="starttime" disabled>
+															<option value="0">12am</option>
+															<option value="1">1am</option>
+															<option value="2">2am</option>
+															<option value="3">3am</option>
+															<option value="4">4am</option>
+															<option value="5">5am</option>
+															<option value="6">6am</option>
+															<option value="7">7am</option>
+															<option value="8">8am</option>
+															<option value="9">9am</option>
+															<option value="10" selected>10am</option>
+															<option value="11">11am</option>
+															<option value="12">12pm</option>
+															<option value="13">1pm</option>
+															<option value="14">2pm</option>
+															<option value="15">3pm</option>
+															<option value="16">4pm</option>
+															<option value="17">5pm</option>
+															<option value="18">6pm</option>
+															<option value="19">7pm</option>
+															<option value="20">8pm</option>
+															<option value="21">9pm</option>
+															<option value="22">10pm</option>
+															<option value="23">11pm</option>
+														</select>
+														<label for="input-starttime">Start</label>
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="form-floating">
+														<select class="form-select form-select-sm trigger-form-submit" id="input-endtime" name="endtime" disabled>
+															<option value="1">1am</option>
+															<option value="2">2am</option>
+															<option value="3">3am</option>
+															<option value="4">4am</option>
+															<option value="5">5am</option>
+															<option value="6">6am</option>
+															<option value="7">7am</option>
+															<option value="8">8am</option>
+															<option value="9">9am</option>
+															<option value="10">10am</option>
+															<option value="11">11am</option>
+															<option value="12">12pm</option>
+															<option value="13">1pm</option>
+															<option value="14">2pm</option>
+															<option value="15">3pm</option>
+															<option value="16" selected>4pm</option>
+															<option value="17">5pm</option>
+															<option value="18">6pm</option>
+															<option value="19">7pm</option>
+															<option value="20">8pm</option>
+															<option value="21">9pm</option>
+															<option value="22">10pm</option>
+															<option value="23">11pm</option>
+															<option value="24">12am</option>
+														</select>
+														<label for="input-endtime">End</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<button type="button" class="btn btn-sm btn-outline-danger remove-entry">Remove Device</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<button type="button" class="btn btn-light">Add Power Source</button>
+				</fieldset>
+
+				<hr>
+
+				<fieldset class="mb-4">
+					<legend>Powered Devices</legend>
+					<div class="entries accordion mb-2" id="entries-power-draws">
+
+						<div class="entry tpl accordion-item">
+							<h2 class="accordion-header">
+								<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#entry-tpl">
+									Powered Device
+								</button>
+							</h2>
+							<div id="entry-tpl" class="accordion-collapse collapse">
+								<div class="accordion-body">
+
+									<div class="form-floating mb-3">
+										<input type="text" class="form-control trigger-form-submit input-name" name="name" id="input-name" placeholder="Device Name">
+										<label for="input-name">Device Name</label>
+									</div>
+
+									<div class="row mb-3 align-items-center justify-content-between">
+										<div class="col-8">
+											<select class="form-select trigger-form-submit" name="type" id="input-type">
+												<option value="" selected>Powered Device Type</option>
+												<option value="solar">Fridge/Freezer</option>
+												<option value="dc-dc">Heater</option>
+												<option value="ac">Light(s)</option>
+												<option value="ac">Charging Device (phone, laptop, etc.)</option>
+												<option value="other">Other</option>
+											</select>
+										</div>
+										<div class="col-auto">
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-active" type="checkbox" value="1" id="input-active" name="active" checked>
+												<label class="form-check-label" for="input-active">Active</label>
+											</div>
+										</div>
+									</div>
+
+									<div class="row mb-3">
+										<div class="col-6">
+											<input type="hidden" id="input-mode" name="mode" value="watts" class="input-mode">
+											<div class="btn-group d-flex">
+												<button type="button" class="btn btn-secondary" data-input-toggle="watts">Watts</button>
+												<button type="button" class="btn btn-outline-secondary" data-input-toggle="amps">Amps</button>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="input-group">
+												<input type="number" inputmode="decimal" class="form-control trigger-form-submit input-watts" id="input-watts" name="watts">
+												<span class="input-group-text">W</span>
+											</div>
+											<div class="input-group" style="display: none;">
+												<input type="number" inputmode="decimal" class="form-control input-amps" id="input-amps" name="amps">
+												<span class="input-group-text">A</span>
+											</div>
+										</div>
+									</div>
+
+									<div class="row mb-2">
+										<div class="col-6">
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="constant" id="input-application-constant" checked>
+												<label class="form-check-label" for="input-application-constant">Constant use</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="variable" id="input-application-variable">
+												<label class="form-check-label" for="input-application-variable">Specific times</label>
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="row g-1">
+												<div class="col-6">
+													<div class="form-floating">
+														<select class="form-select form-select-sm trigger-form-submit" id="input-starttime" name="starttime" disabled>
+															<option value="0">12am</option>
+															<option value="1">1am</option>
+															<option value="2">2am</option>
+															<option value="3">3am</option>
+															<option value="4">4am</option>
+															<option value="5">5am</option>
+															<option value="6">6am</option>
+															<option value="7">7am</option>
+															<option value="8">8am</option>
+															<option value="9">9am</option>
+															<option value="10" selected>10am</option>
+															<option value="11">11am</option>
+															<option value="12">12pm</option>
+															<option value="13">1pm</option>
+															<option value="14">2pm</option>
+															<option value="15">3pm</option>
+															<option value="16">4pm</option>
+															<option value="17">5pm</option>
+															<option value="18">6pm</option>
+															<option value="19">7pm</option>
+															<option value="20">8pm</option>
+															<option value="21">9pm</option>
+															<option value="22">10pm</option>
+															<option value="23">11pm</option>
+														</select>
+														<label for="input-starttime">Start</label>
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="form-floating">
+														<select class="form-select form-select-sm trigger-form-submit" id="input-endtime" name="endtime" disabled>
+															<option value="1">1am</option>
+															<option value="2">2am</option>
+															<option value="3">3am</option>
+															<option value="4">4am</option>
+															<option value="5">5am</option>
+															<option value="6">6am</option>
+															<option value="7">7am</option>
+															<option value="8">8am</option>
+															<option value="9">9am</option>
+															<option value="10">10am</option>
+															<option value="11">11am</option>
+															<option value="12">12pm</option>
+															<option value="13">1pm</option>
+															<option value="14">2pm</option>
+															<option value="15">3pm</option>
+															<option value="16" selected>4pm</option>
+															<option value="17">5pm</option>
+															<option value="18">6pm</option>
+															<option value="19">7pm</option>
+															<option value="20">8pm</option>
+															<option value="21">9pm</option>
+															<option value="22">10pm</option>
+															<option value="23">11pm</option>
+															<option value="24">12am</option>
+														</select>
+														<label for="input-endtime">End</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<button type="button" class="btn btn-sm btn-outline-danger remove-entry">Remove Device</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<button type="button" class="btn btn-light">Add Powered Device</button>
+				</fieldset>
+
+				<hr>
+
+				<div class="mb-3">
+					<div class="row">
+						<label for="input-days" class="col-6 col-form-label">Days to Simulate</label>
+						<div class="col-6">
+							<select class="form-select trigger-form-submit" id="input-days" name="days">
+								<option value="1" selected>1 day</option>
+								<option value="2">2 days</option>
+								<option value="3">3 days</option>
+								<option value="4">4 days</option>
+								<option value="5">5 days</option>
+								<option value="6">6 days</option>
+								<option value="7">7 days</option>
+								<option value="8">8 days</option>
+								<option value="9">9 days</option>
+								<option value="10">10 days</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<div class="row">
+						<label for="input-simstarttime" class="col-6 col-form-label">Start Time</label>
+						<div class="col-6">
+							<select class="form-select trigger-form-submit" id="input-simstarttime" name="simstarttime">
+								<option value="0">12am</option>
+								<option value="1">1am</option>
+								<option value="2">2am</option>
+								<option value="3">3am</option>
+								<option value="4">4am</option>
+								<option value="5">5am</option>
+								<option value="6">6am</option>
+								<option value="7">7am</option>
+								<option value="8" selected>8am</option>
+								<option value="9">9am</option>
+								<option value="10">10am</option>
+								<option value="11">11am</option>
+								<option value="12">12pm</option>
+								<option value="13">1pm</option>
+								<option value="14">2pm</option>
+								<option value="15">3pm</option>
+								<option value="16">4pm</option>
+								<option value="17">5pm</option>
+								<option value="18">6pm</option>
+								<option value="19">7pm</option>
+								<option value="20">8pm</option>
+								<option value="21">9pm</option>
+								<option value="22">10pm</option>
+								<option value="23">11pm</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<div class="row">
+						<label for="input-initsoc" class="col-6 col-form-label">Initial State of Charge</label>
+						<div class="col-6">
+							<select class="form-select trigger-form-submit" id="input-initsoc" name="initsoc">
+								<option value="100" selected>100%</option>
+								<option value="90">90%</option>
+								<option value="80">80%</option>
+								<option value="70">70%</option>
+								<option value="60">60%</option>
+								<option value="50">50%</option>
+								<option value="40">40%</option>
+								<option value="30">30%</option>
+								<option value="20">20%</option>
+								<option value="10">10%</option>
+								<option value="0">0%</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="output mt-5">
+					<div class="chart-container">
+						<div class="inner">
+							<canvas id="chart"></canvas>
+						</div>
+					</div>
+				</div>
+
+			</form>
+
+		</div>
+		
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<script>
+
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+		const ctx = document.getElementById('chart');
+		var chart = null;
+
+
+		$(document).ready(function() {
+
+			var initialValues = {
+				volts: 12,
+				wh: 1200,
+				dayCount: 2,
+				initChargePercent: 100,
+				startTime: 8
+			};
+
+			$('#input-volts').val(initialValues.volts);
+			$('#input-wh').val(initialValues.wh);
+			$('#input-ah').val((initialValues.wh / initialValues.volts).toFixed(2));
+
+
+			$('#input-wh ~ button').on('click', function(e) {
+				if($(this).hasClass('btn-secondary')) return;
+				var mode = $(this).data('input-toggle');
+				$(this).removeClass('btn-outline-secondary').addClass('btn-secondary');
+				$(this).siblings().each(function(i, el) {
+					$(el).removeClass('btn-secondary').addClass('btn-outline-secondary');
+					var input = $(el).data('input-toggle');
+					$('#input-' + input).hide();
+				});
+				var input = $(this).data('input-toggle');
+				$('#input-' + input).show();
+			});
+			$('#input-wh, #input-ah').on('change keyup', function(e) {
+				var mode = $(this).siblings('.btn-secondary').data('input-toggle');
+				var volts = parseFloat($('#input-volts').val());
+				if(mode == 'ah' && $(this).is('#input-ah')) {
+					var ah = parseFloat($('#input-ah').val());
+					$('#input-wh').val(volts * ah).trigger('change', false);
+				} else if(mode == 'wh' && $(this).is('#input-wh')) {
+					var wh = parseFloat($('#input-wh').val());
+					$('#input-ah').val((wh / volts).toFixed(2));
+				}
+			});
+
+			$('.entries + button').on('click', function(e) {
+				var entries = $(this).prev('.entries');
+				var tpl = $('> .entry.tpl', entries).clone();
+				tpl.removeClass('tpl');
+
+				var entryId = new Date().valueOf();
+				$('> .accordion-collapse', tpl).attr('id', 'entry-' + entryId);
+				$('> .accordion-header .accordion-button', tpl).attr('data-bs-target', '#entry-' + entryId);
+				$('input, select', tpl).each(function(i, el) {
+					$(el).attr('id', 'entry-' + entryId + '-' + $(el).attr('id'));
+					$(el).attr('name', 'e' + entryId + '_' + $(el).attr('name'));
+				});
+				$('label', tpl).each(function(i, el) {
+					var inputId = $(el).attr('for');
+					if(inputId) $(el).attr('for', 'entry-' + entryId + '-' + inputId);
+				});
+
+				$('#entry-' + entryId + '-input-application-constant', tpl).prop('checked', true);
+
+				entries.append(tpl);
+				$('> .accordion-header .accordion-button', tpl).trigger('click');
+				entries.closest('form').trigger('submit');
+			});
+
+			$('#calculator').on('click', '.entry button.remove-entry', function(e) {
+				var entry = $(this).closest('.entry');
+				var form = $(this).closest('form');
+				if(confirm('Are you sure you want to delete this device and it\'s settings from your setup?')) {
+					entry.remove();
+					form.trigger('submit');
+				}
+			});
+
+			$('#calculator').on('updateEntry', '.entry', function(e) {
+				var entry = $(this);
+				var name = $('input.input-name', entry).val().trim();
+				if(name == '') name = entry.siblings('.tpl').find('> .accordion-header .accordion-button').text().trim();
+				var watts = parseFloat($('input.input-watts', entry).val());
+				if(!isNaN(watts) && watts != 0) name += ' (' + watts + 'W)';
+				$('> .accordion-header .accordion-button', entry).text(name);
+				var isActive = $('input.input-active', entry).prop('checked');
+				if(isActive) {
+					entry.removeClass('disabled');
+				} else {
+					entry.addClass('disabled');
+				}
+			});
+
+			$('#calculator').on('change keyup', 'input.input-name, input.input-watts, input.input-active', function(e) {
+				$(this).closest('.entry').trigger('updateEntry');
+			});
+
+			$('#calculator').on('click', 'input.input-mode + .btn-group button', function(e) {
+				if($(this).hasClass('btn-secondary')) return;
+				var entry = $(this).closest('.entry');
+				var entryId = entry.find('> .accordion-collapse').attr('id').replace(/^entry-/, '');
+				var mode = $(this).data('input-toggle');
+				$('input.input-mode', entry).val(mode).trigger('change');
+				$(this).removeClass('btn-outline-secondary').addClass('btn-secondary');
+				$(this).siblings().each(function(i, el) {
+					$(el).removeClass('btn-secondary').addClass('btn-outline-secondary');
+					var input = $(el).data('input-toggle');
+					$('#entry-' + entryId + '-input-' + input).closest('.input-group').hide();
+				});
+				var input = $(this).data('input-toggle');
+				$('#entry-' + entryId + '-input-' + input).closest('.input-group').show();
+			});
+
+			$('#calculator').on('change keyup', 'input.input-watts, input.input-amps', function(e) {
+				var entry = $(this).closest('.entry');
+				var mode = $('input.input-mode', entry).val();
+				var volts = parseFloat($('#input-volts').val());
+				if(mode == 'amps' && $(this).hasClass('input-amps')) {
+					var amps = parseFloat($('input.input-amps', entry).val());
+					$('input.input-watts', entry).val(volts * amps).trigger('change', false);
+				} else if(mode == 'watts' && $(this).hasClass('input-watts')) {
+					var watts = parseFloat($('input.input-watts', entry).val());
+					$('input.input-amps', entry).val((watts / volts).toFixed(2));
+				}
+			});
+
+			$('#calculator').on('change', 'input.input-application', function(e) {
+				var entry = $(this).closest('.entry');
+				var entryId = entry.find('> .accordion-collapse').attr('id').replace(/^entry-/, '');
+				var application = $('input.input-application:checked', entry).val();
+				if(application == 'variable') {
+					$('#entry-' + entryId + '-input-starttime, #entry-' + entryId + '-input-endtime').prop('disabled', false);
+				} else {
+					$('#entry-' + entryId + '-input-starttime, #entry-' + entryId + '-input-endtime').prop('disabled', true);
+				}
+			});
+
+			
+
+			// $('#input-volts, #input-amps').on('change keyup', function(e, recalculateWatts) {
+			// 	if(recalculateWatts === false) return;
+			// 	var volts = parseFloat($('#input-volts').val());
+			// 	var amps = parseFloat($('#input-amps').val());
+			// 	$('#input-watts').val(volts * amps);
+			// });
+			// $('#input-watts').on('change keyup', function(e) {
+			// 	var volts = parseFloat($('#input-volts').val());
+			// 	var watts = parseFloat($('#input-watts').val());
+			// 	$('#input-amps').val((watts / volts).toFixed(2)).trigger('change', false);
+			// });
+
+			$('#calculator').on('change keyup', 'input.trigger-form-submit, select.trigger-form-submit', function(e) { $(this).closest('form').trigger('submit'); });
+
+			$('#calculator').on('submit', function(e) {
+				e.preventDefault();
+				
+				var system = [];
+
+				$('.entries > .entry:not(.tpl)', this).each(function(i, el) {
+					var entry = $(el);
+					var entryId = $('> .accordion-collapse', entry).attr('id').replace(/^entry-/, '');
+					var device = {
+						name: $('#entry-' + entryId + '-input-name').val().trim(),
+						isSource: entry.closest('.entries').attr('id') == 'entries-power-sources',
+						type: $('#entry-' + entryId + '-input-type').val(),
+						isActive: $('#entry-' + entryId + '-input-active').is(':checked'),
+						watts: parseFloat($('#entry-' + entryId + '-input-watts').val()),
+						application: $('.input-application:checked', entry).val(),
+						startTime: parseFloat($('#entry-' + entryId + '-input-starttime').val()),
+						endTime: parseFloat($('#entry-' + entryId + '-input-endtime').val()),
+						profile: []
+					};
+					if(device.name == '') device.name = entry.siblings('.tpl').find('> .accordion-header .accordion-button').text().trim();
+					if(isNaN(device.watts)) device.watts = 0;
+					device.profile = getDeviceProfile(device);
+					system.push(device);
+				});
+				// console.log(system);
+
+
+				if(chart == null) {
+					chart = new Chart(ctx, {
+						responsive: true,
+						type: 'line',
+						data: {
+							labels: getChartLabels(),
+							datasets: getChartDataSets(system)
+						},
+						options: {
+							scales: {
+								y: {
+									min: 0,
+									max: 100,
+									ticks: {
+										callback: function(value, index, ticks) {
+											return Chart.Ticks.formatters.numeric.apply(this, [value, index, ticks]) + '%';
+										}
+									}
+								},
+								x: {
+									ticks: {
+										autoSkip: false,
+										font: function(context) {
+											if(context.tick.label.match(/^Day /)) {
+												return { weight: 'bold' };
+											}
+										},
+										color: function(context) {
+											if(context.tick.label.match(/^Day /)) {
+												return 'rgba(0, 0, 0, 1)';
+											} else if(context.tick.label.match(/^(12|6)(am|pm)$/)) {
+												return 'rgba(0, 0, 0, 0.5)';
+											} else if(context.index == 0) {
+												return 'rgba(0, 0, 0, 0.5)';
+											}
+											return 'rgba(0, 0, 0, 0)';
+										}
+									}
+								}
+							},
+							plugins: {
+								legend: {
+									display: false
+								},
+								tooltip: {
+									callbacks: {
+										label: function(context) {
+											if (context.dataset.label == 'Battery SOC') {
+												var label = context.dataset.label + ': ';
+												label += context.parsed.y + '%';
+												return label;
+											}
+											return context.parsed.y;
+										}
+									}
+								}
+							}
+						}
+					});
+				} else {
+					chart.data.labels = getChartLabels();
+					var dataSets = getChartDataSets(system);
+					for(var i = 0; i < chart.data.datasets.length; i++) {
+						chart.data.datasets[i].data = dataSets[i].data;
+					}
+					chart.update();
+				}
+
+
+				return false;
+			}).on('updateQueryParams', _.debounce(updateQueryParams, 100));
+
+			$('#calculator').trigger('submit');
+
+		});
+
+		function updateQueryParams() {
+			// var volts = parseFloat($('#input-volts').val());
+			// var amps = parseFloat($('#input-amps').val());
+			// var distance = parseFloat($('#input-distance').val());
+			// var wattsMode = $('button[data-input-toggle=watts]').hasClass('btn-secondary') ? 1 : 0;
+			// setQueryParam('volts', volts);
+			// setQueryParam('amps', amps);
+			// setQueryParam('distance', distance);
+			// setQueryParam('wattsMode', wattsMode);
+		}
+
+
+		function getChartLabels() {
+			var labels = [];
+
+			var dayCount = parseInt($('#input-days').val());
+			var startTime = parseInt($('#input-simstarttime').val());
+			var initSOC = parseInt($('#input-initsoc').val());
+
+			var hour = startTime;
+			var day = 1;
+			for(var i = startTime; i <= dayCount * 24; i++) {
+				if(hour >= 24) {
+					hour = 0;
+					day++;
+				}
+				var label = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+				label += hour < 12 ? 'am' : 'pm';
+				if(hour == 0 && i != dayCount * 24) {
+					label = 'Day ' + day;
+				}
+				labels.push(label);
+				hour++;
+			}
+			return labels;
+		}
+
+		function getChartDataSets(system) {
+			var soc = [];
+
+			var capacity = parseFloat($('#input-wh').val());
+			var dayCount = parseInt($('#input-days').val());
+			var startTime = parseInt($('#input-simstarttime').val());
+			var initSOC = parseInt($('#input-initsoc').val());
+
+			var hour = startTime;
+			var currentWh = capacity * initSOC / 100;
+			for(var i = startTime; i <= dayCount * 24; i++) {
+				if(hour >= 24) hour = 0;
+				if(i == 0) {
+					soc.push(currentWh / capacity);
+				} else {
+					var profileIndex = i - startTime;
+					var netWatts = 0;
+					for(var j in system) {
+						var device = system[j];
+						netWatts += device.profile[profileIndex] * (device.isSource ? 1 : -1);
+					}
+					currentWh += netWatts;
+					currentWh = Math.max(0, currentWh);
+					currentWh = Math.min(capacity, currentWh);
+					soc.push((currentWh / capacity) * 100);
+				}
+				hour++;
+			}
+
+			var dataSets = [{
+				label: 'Battery SOC',
+				data: soc,
+				fill: false,
+				borderColor: 'rgb(13, 110, 253)',
+				tension: 0
+			}];
+
+			return dataSets;
+		}
+
+		function getDeviceProfile(device) {
+			var profile = [0];
+
+			var startTime = parseInt($('#input-simstarttime').val());
+			var dayCount = parseInt($('#input-days').val());
+
+			var hour = startTime;
+			for(var i = startTime; i <= dayCount * 24; i++) {
+				if(hour >= 24) hour = 0;
+				var watts = device.watts;
+				// adjust if needed
+				if(device.type == 'solar') {
+					watts = getSolarOutputEfficiency(hour) * device.watts;
+				}
+				if(!device.isActive) {
+					profile.push(0);
+				} else if(device.application == 'constant') {
+					profile.push(watts);
+				} else if(hour >= device.startTime && hour < device.endTime) {
+					profile.push(watts);
+				} else {
+					profile.push(0);
+				}
+				hour++;
+			}
+
+			return profile;
+		}
+
+		function getSolarOutputEfficiency(hour) {
+			var efficiencyProfile = [
+				0,		// 12am
+				0,		// 1am
+				0,		// 2am
+				0,		// 3am
+				0,		// 4am
+				0,		// 5am
+				5,		// 6am
+				10,		// 7am
+				15,		// 8am
+				20, 	// 9am
+				40, 	// 10am
+				80, 	// 11am
+				100, 	// 12pm
+				100, 	// 1pm
+				100, 	// 2pm
+				100, 	// 3pm
+				70, 	// 4pm
+				50, 	// 5pm
+				30, 	// 6pm
+				15, 	// 7pm
+				5, 		// 8pm
+				0, 		// 9pm
+				0, 		// 10pm
+				0, 		// 11pm
+				0, 		// 12am
+			];
+			return efficiencyProfile[hour] / 100;
+		}
+
+
+		function generateRandomNumber(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		function setCookie(name, value, days) {
+			var expires = "";
+			if (days) {
+				var date = new Date();
+				date.setTime(date.getTime() + (days*24*60*60*1000));
+				expires = "; expires=" + date.toUTCString();
+			}
+			document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+		}
+		function getCookie(name) {
+			var nameEQ = name + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0;i < ca.length;i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1,c.length);
+				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			}
+			return null;
+		}
+		function setQueryParam(name, value) {
+			if('URLSearchParams' in window && history.pushState != null) {
+				var url = new URL(window.location);
+				url.searchParams.set(name, value);
+				history.pushState(null, '', url);
+			}
+		}
+		function getQueryParam(name) {
+			if('URLSearchParams' in window) {
+				var queryParams = new URLSearchParams(window.location.search);
+				return queryParams.get(name);
+			}
+		}
+
+	</script>
+
+</body>
+</html>
