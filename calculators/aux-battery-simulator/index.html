@@ -65,12 +65,8 @@
 			padding: 1rem .5rem;
 		}
 
-		.output {
-			position: relative;
-			width: 100vw;
-			padding: 0 20px 40px;
-			left: 50%;
-			transform: translateX(-50%);
+		#output {
+			padding: 40px 20px;
 			overflow-x: auto;
 		}
 		.chart-container {
@@ -85,6 +81,34 @@
 			top: 0;
 			width: 100%;
 			height: 100%;
+		}
+		@media (min-width: 1400px) {
+			#main {
+				width: 440px;
+				position: fixed;
+				left: 0;
+				top: 56px;
+				height: calc(100vh - 56px);
+				overflow-y: auto;
+				border-right: 1px solid rgba(33, 37, 41, .25);
+			}
+			#output {
+				position: fixed;
+				right: 0;
+				top: 56px;
+				width: calc(100vw - 440px - 1px);
+				height: calc(100vh - 56px);
+				margin-top: 0;
+				left: auto;
+				transform: none;
+				overflow-y: auto;
+				display: flex;
+				padding: 20px;
+			}
+			.chart-container {
+				width: 100%;
+				height: auto;
+			}
 		}
 	</style>
 
@@ -356,10 +380,10 @@
 										<div class="col-8">
 											<select class="form-select trigger-form-submit" name="type" id="input-type">
 												<option value="" selected>Powered Device Type</option>
-												<option value="solar">Fridge/Freezer</option>
-												<option value="dc-dc">Heater</option>
-												<option value="ac">Light(s)</option>
-												<option value="ac">Charging Device (phone, laptop, etc.)</option>
+												<option value="fridge-freezer">Fridge/Freezer</option>
+												<option value="heater">Heater</option>
+												<option value="light">Light(s)</option>
+												<option value="charging-device">Charging Device (phone, laptop, etc.)</option>
 												<option value="other">Other</option>
 											</select>
 										</div>
@@ -559,16 +583,16 @@
 					</div>
 				</div>
 
-				<div class="output mt-5">
-					<div class="chart-container">
-						<div class="inner">
-							<canvas id="chart"></canvas>
-						</div>
-					</div>
-				</div>
-
 			</form>
 
+		</div>
+
+		<div id="output">
+			<div class="chart-container">
+				<div class="inner">
+					<canvas id="chart"></canvas>
+				</div>
+			</div>
 		</div>
 		
 	</div>
@@ -924,7 +948,7 @@
 			for(var i = startTime; i <= dayCount * 24; i++) {
 				if(hour >= 24) hour = 0;
 				var watts = device.watts;
-				// adjust if needed
+				console.log(device.type);
 				if(device.type == 'solar') {
 					watts = getSolarOutputEfficiency(hour) * device.watts;
 				}
