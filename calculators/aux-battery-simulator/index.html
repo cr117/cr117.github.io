@@ -40,6 +40,14 @@
 			font-weight: 700;
 		}
 
+		.modal-header .btn-group {
+			margin: 0;
+			margin-left: auto;
+		}
+		.modal-header .btn-group + .btn-close {
+			margin-left: 8px;
+		}
+
 		#input-ah {
 			border-top-left-radius: var(--bs-border-radius);
 			border-bottom-left-radius: var(--bs-border-radius);
@@ -708,6 +716,16 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h1 class="modal-title fs-5" id="exampleModalLabel">Customize Usage Profile</h1>
+					<div class="btn-group">
+						<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Load Preset</button>
+						<ul class="load-preset-menu dropdown-menu dropdown-menu-end">
+							<li><a class="dropdown-item" href="#" data-profile-preset="allDay0">0% All Day</a></li>
+							<li><a class="dropdown-item" href="#" data-profile-preset="allDay100">100% All Day</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" href="#" data-profile-preset="solar">Typical Solar Efficiency</a></li>
+							<li><a class="dropdown-item" href="#" data-profile-preset="fridge">Typical Fridge/Freezer Duty Cycle</a></li>
+						</ul>
+					</div>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
@@ -853,6 +871,15 @@
 
 		const ctx = document.getElementById('chart');
 		var chart = null;
+
+		var usageProfilePresets = {
+			// time of day	12	1	2	3	4	5	6	7	8	9	10	11	12	1	2	3	4	5	6	7	8	9	10	11
+			allDay0:	[	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	],
+			allDay100:	[	100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100	],
+			solar:		[	0,	0,	0,	0,	0,	0,	5,	10,	15,	20,	40,	80,100,100,100,100,	70,	50,	30,	15,	5,	0,	0,	0	],
+			fridge:		[  	10,	10,	10,	15,	15,	15,	20,	30,	40,	45,	50,	50,	50,	50,	50,	45,	45,	40,	35,	30,	25,	20,	15,	15	]
+		};
+
 
 
 		$(document).ready(function() {
@@ -1049,6 +1076,19 @@
 				}
 				$('#entry-' + entryId + '-input-profileutilization').val(JSON.stringify(profile)).trigger('change');
 				$('#profile-utilization-modal').modal('hide');
+			});
+
+			$('#profile-utilization-modal').on('click', '.load-preset-menu a', function(e) {
+				e.preventDefault();
+				var preset = $(this).data('profile-preset');
+				if(usageProfilePresets[preset]) {
+					var profile = usageProfilePresets[preset];
+					for(var i = 0; i < 24; i++) {
+						var value = profile[i];
+						var rangeInput = $('#profile-utilization-modal input[type=range]').eq(i);
+						rangeInput.val(value).trigger('change');
+					}
+				}
 			});
 
 			
@@ -1308,37 +1348,6 @@
 			}
 
 			return profile;
-		}
-
-		function getSolarOutputEfficiency(hour) {
-			var efficiencyProfile = [
-				0,		// 12am
-				0,		// 1am
-				0,		// 2am
-				0,		// 3am
-				0,		// 4am
-				0,		// 5am
-				5,		// 6am
-				10,		// 7am
-				15,		// 8am
-				20, 	// 9am
-				40, 	// 10am
-				80, 	// 11am
-				100, 	// 12pm
-				100, 	// 1pm
-				100, 	// 2pm
-				100, 	// 3pm
-				70, 	// 4pm
-				50, 	// 5pm
-				30, 	// 6pm
-				15, 	// 7pm
-				5, 		// 8pm
-				0, 		// 9pm
-				0, 		// 10pm
-				0, 		// 11pm
-				0, 		// 12am
-			];
-			return efficiencyProfile[hour] / 100;
 		}
 
 
