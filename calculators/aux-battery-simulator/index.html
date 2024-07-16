@@ -822,6 +822,30 @@
 			$('#input-ah').val((initialValues.wh / initialValues.volts).toFixed(2));
 
 
+			$('#input-volts').on('change keyup', function(e) {
+				var volts = parseFloat($('#input-volts').val());
+				var mode = $('#input-wh').siblings('.btn-secondary').data('input-toggle');
+				if(mode == 'ah') {
+					var ah = parseFloat($('#input-ah').val());
+					$('#input-wh').val(volts * ah);
+				} else if(mode == 'wh') {
+					var wh = parseFloat($('#input-wh').val());
+					$('#input-ah').val((wh / volts).toFixed(2));
+				}
+				$('#calculator .entries > .entry:not(.tpl)').each(function(i, el) {
+					var entry = $(el);
+					var mode = $('input.input-mode', entry).val();
+					if(mode == 'amps') {
+						var amps = parseFloat($('input.input-amps', entry).val());
+						$('input.input-watts', entry).val(volts * amps);
+					} else if(mode == 'watts') {
+						var watts = parseFloat($('input.input-watts', entry).val());
+						$('input.input-amps', entry).val((watts / volts).toFixed(2));
+					}
+				});
+				$(this).closest('form').trigger('submit');
+			});
+
 			$('#input-wh ~ button').on('click', function(e) {
 				if($(this).hasClass('btn-secondary')) return;
 				var mode = $(this).data('input-toggle');
