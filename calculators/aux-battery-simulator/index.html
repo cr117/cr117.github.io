@@ -57,8 +57,52 @@
 			border-top-right-radius: var(--bs-accordion-inner-border-radius);
 		}
 
-		.entries.accordion .entry.disabled > .accordion-header .accordion-button {
-			text-decoration: line-through;
+		.entry > .accordion-header {
+			position: relative;
+		}
+		.entry > .accordion-header .accordion-button {
+			padding-left: 3rem;
+		}
+		.entry > .accordion-header .entry-toggle {
+			position: absolute;
+			left: .75rem;
+			top: 1.11rem;
+			z-index: 8;
+		}
+		.entry > .accordion-header .entry-toggle input {
+			display: none;
+		}
+		.entry > .accordion-header .entry-toggle label {
+			display: block;
+			width: 1.75rem;
+			height: 1rem;
+			border-radius: 100px;
+			border: 1px solid rgba(0, 0, 0, .15);
+			background-color: rgba(0, 0, 0, .05);
+			position: relative;
+			transition: background-color .15s, border-color .15s;
+			cursor: pointer;
+		}
+		.entry > .accordion-header .entry-toggle input:checked + label {
+			border-color: rgb(13, 110, 253);
+			background-color: rgb(13, 110, 253);
+		}
+		.entry > .accordion-header .entry-toggle label::before {
+			content: '';
+			position: absolute;
+			width: 1rem;
+			height: 1rem;
+			border-radius: 100px;
+			border: 1px solid #aaa;
+			background-color: #fff;
+			left: calc(1.75rem - 1rem - 1px);
+			top: -1px;
+			transition: left .15s ease-out, background-color .15s, border-color .15s;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+		}
+		.entry > .accordion-header .entry-toggle input:checked + label::before {
+			left: -1px;
+			border-color: rgb(13, 110, 253);
 		}
 
 		.entry button.customize-profile-utilization {
@@ -260,6 +304,10 @@
 								<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#entry-tpl">
 									Power Source Device
 								</button>
+								<div class="entry-toggle">
+									<input class="form-check-input trigger-form-submit input-active" type="checkbox" value="1" id="input-active" name="active" checked>
+									<label class="form-check-label" for="input-active"></label>
+								</div>
 							</h2>
 							<div id="entry-tpl" class="accordion-collapse collapse">
 								<div class="accordion-body">
@@ -269,7 +317,7 @@
 										<label for="input-name">Device Name</label>
 									</div>
 
-									<div class="row mb-3 align-items-center justify-content-between">
+									<div class="row mb-3 align-items-center justify-content-between d-none">
 										<div class="col-8">
 											<select class="form-select trigger-form-submit" name="type" id="input-type">
 												<option value="" selected>Power Source Type</option>
@@ -279,12 +327,7 @@
 												<option value="other">Other</option>
 											</select>
 										</div>
-										<div class="col-auto">
-											<div class="form-check">
-												<input class="form-check-input trigger-form-submit input-active" type="checkbox" value="1" id="input-active" name="active" checked>
-												<label class="form-check-label" for="input-active">Active</label>
-											</div>
-										</div>
+										<div class="col-auto"></div>
 									</div>
 
 									<div class="row mb-3">
@@ -420,6 +463,10 @@
 								<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#entry-tpl">
 									Powered Device
 								</button>
+								<div class="entry-toggle">
+									<input class="form-check-input trigger-form-submit input-active" type="checkbox" value="1" id="input-active" name="active" checked>
+									<label class="form-check-label" for="input-active"></label>
+								</div>
 							</h2>
 							<div id="entry-tpl" class="accordion-collapse collapse">
 								<div class="accordion-body">
@@ -429,7 +476,7 @@
 										<label for="input-name">Device Name</label>
 									</div>
 
-									<div class="row mb-3 align-items-center justify-content-between">
+									<div class="row mb-3 align-items-center justify-content-between d-none">
 										<div class="col-8">
 											<select class="form-select trigger-form-submit" name="type" id="input-type">
 												<option value="" selected>Powered Device Type</option>
@@ -440,12 +487,7 @@
 												<option value="other">Other</option>
 											</select>
 										</div>
-										<div class="col-auto">
-											<div class="form-check">
-												<input class="form-check-input trigger-form-submit input-active" type="checkbox" value="1" id="input-active" name="active" checked>
-												<label class="form-check-label" for="input-active">Active</label>
-											</div>
-										</div>
+										<div class="col-auto"></div>
 									</div>
 
 									<div class="row mb-3">
