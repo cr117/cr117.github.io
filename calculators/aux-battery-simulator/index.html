@@ -61,6 +61,42 @@
 			text-decoration: line-through;
 		}
 
+		.entry button.customize-profile-utilization {
+			display: block;
+			width: 100%;
+		}
+		.entry button.customize-profile-utilization .chart {
+			display: block;
+			display: flex;
+			justify-content: center;
+			height: 30px;
+			margin: 5px 0;
+			margin-left: -1px;
+		}
+		.entry button.customize-profile-utilization .chart .bar {
+			margin-left: 1px;
+			flex: 1 1 auto;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			background-color: rgba(0, 0, 0, .1);
+			border-radius: 1px;
+			transition: background-color .15s ease-in-out;
+		}
+		.entry button.customize-profile-utilization .chart .bar .meter {
+			display: block;
+			width: 100%;
+			background-color: rgb(13, 110, 253);
+			border-radius: 1px;
+			transition: background-color .15s ease-in-out;
+		}
+		.entry button.customize-profile-utilization:hover .chart .bar {
+			background-color: rgba(255,255,255,.2);
+		}
+		.entry button.customize-profile-utilization:hover .chart .bar .meter {
+			background-color: rgba(255,255,255,1);
+		}
+
 		.form-floating .form-select.form-select-sm ~ label {
 			padding: 1rem .5rem;
 		}
@@ -272,12 +308,16 @@
 												<label class="form-check-label" for="input-application-constant">Constant supply</label>
 											</div>
 											<div class="form-check">
-												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="variable" id="input-application-variable">
-												<label class="form-check-label" for="input-application-variable">Specific times</label>
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="period" id="input-application-period">
+												<label class="form-check-label" for="input-application-period">Specific period</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="custom" id="input-application-custom">
+												<label class="form-check-label" for="input-application-custom">Custom profile</label>
 											</div>
 										</div>
 										<div class="col-6">
-											<div class="row g-1">
+											<div class="row g-1 input-period-select">
 												<div class="col-6">
 													<div class="form-floating">
 														<select class="form-select form-select-sm trigger-form-submit" id="input-starttime" name="starttime" disabled>
@@ -340,6 +380,13 @@
 														<label for="input-endtime">End</label>
 													</div>
 												</div>
+											</div>
+											<div class="input-custom-profile-setting" style="display: none;">
+												<input type="hidden" class="trigger-form-submit" name="profileutilization" id="input-profileutilization" value="">
+												<button type="button" class="btn btn-outline-secondary customize-profile-utilization" data-bs-toggle="modal" data-bs-target="#profile-utilization-modal">
+													<span class="chart"></span>
+													<span class="label">Customize</span>
+												</button>
 											</div>
 										</div>
 									</div>
@@ -419,15 +466,19 @@
 										<div class="col-6">
 											<div class="form-check">
 												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="constant" id="input-application-constant" checked>
-												<label class="form-check-label" for="input-application-constant">Constant use</label>
+												<label class="form-check-label" for="input-application-constant">Constant supply</label>
 											</div>
 											<div class="form-check">
-												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="variable" id="input-application-variable">
-												<label class="form-check-label" for="input-application-variable">Specific times</label>
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="period" id="input-application-period">
+												<label class="form-check-label" for="input-application-period">Specific period</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input trigger-form-submit input-application" type="radio" name="application" value="custom" id="input-application-custom">
+												<label class="form-check-label" for="input-application-custom">Custom profile</label>
 											</div>
 										</div>
 										<div class="col-6">
-											<div class="row g-1">
+											<div class="row g-1 input-period-select">
 												<div class="col-6">
 													<div class="form-floating">
 														<select class="form-select form-select-sm trigger-form-submit" id="input-starttime" name="starttime" disabled>
@@ -490,6 +541,13 @@
 														<label for="input-endtime">End</label>
 													</div>
 												</div>
+											</div>
+											<div class="input-custom-profile-setting" style="display: none;">
+												<input type="hidden" class="trigger-form-submit" name="profileutilization" id="input-profileutilization" value="">
+												<button type="button" class="btn btn-outline-secondary customize-profile-utilization" data-bs-toggle="modal" data-bs-target="#profile-utilization-modal">
+													<span class="chart"></span>
+													<span class="label">Customize</span>
+												</button>
 											</div>
 										</div>
 									</div>
@@ -595,6 +653,144 @@
 			</div>
 		</div>
 		
+	</div>
+
+	<div id="profile-utilization-modal" class="modal fade">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="exampleModalLabel">Customize Usage Profile</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" name="entryid">
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">12am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">1am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">2am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">3am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">4am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">5am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">6am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">7am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">8am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">9am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">10am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">11am</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">12pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">1pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">2pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">3pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">4pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">5pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">6pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">7pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">8pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">9pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center mb-2">
+						<div class="col-2 time">10pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+					<div class="row align-items-center">
+						<div class="col-2 time">11pm</div>
+						<div class="col range"><input type="range" class="form-range d-block" min="0" max="100" step="5"></div>
+						<div class="col-2 value text-end">50%</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary">Save Changes</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
@@ -722,6 +918,7 @@
 				var entry = $(this).closest('.entry');
 				var mode = $('input.input-mode', entry).val();
 				var volts = parseFloat($('#input-volts').val());
+
 				if(mode == 'amps' && $(this).hasClass('input-amps')) {
 					var amps = parseFloat($('input.input-amps', entry).val());
 					$('input.input-watts', entry).val(volts * amps).trigger('change', false);
@@ -735,11 +932,51 @@
 				var entry = $(this).closest('.entry');
 				var entryId = entry.find('> .accordion-collapse').attr('id').replace(/^entry-/, '');
 				var application = $('input.input-application:checked', entry).val();
-				if(application == 'variable') {
+				if(application == 'period') {
 					$('#entry-' + entryId + '-input-starttime, #entry-' + entryId + '-input-endtime').prop('disabled', false);
 				} else {
 					$('#entry-' + entryId + '-input-starttime, #entry-' + entryId + '-input-endtime').prop('disabled', true);
 				}
+				if(application == 'custom') {
+					$('.input-period-select', entry).hide();
+					$('.input-custom-profile-setting', entry).show();
+				} else {
+					$('.input-period-select', entry).show();
+					$('.input-custom-profile-setting', entry).hide();
+				}
+			});
+
+			$('#calculator').on('click', 'button.customize-profile-utilization', function(e) {
+				var entry = $(this).closest('.entry');
+				var entryId = $('> .accordion-collapse', entry).attr('id').replace(/^entry-/, '');
+				$('#profile-utilization-modal input[name=entryid]').val(entryId);
+				var profileUtilizationValue = $('#entry-' + entryId + '-input-profileutilization').val().trim();
+				var profileUtilization = profileUtilizationValue != '' ? JSON.parse(profileUtilizationValue) : null;
+				for(var i = 0; i < 24; i++) {
+					var value = 100;
+					if(profileUtilization) {
+						value = profileUtilization[i];
+					}
+					var rangeInput = $('#profile-utilization-modal input[type=range]').eq(i);
+					rangeInput.val(value).trigger('change');
+				}
+			});
+
+			$('#profile-utilization-modal').on('change input', 'input[type=range]', function(e) {
+				var row = $(this).closest('.row');
+				var value = $(this).val();
+				$('> .value', row).text(value + '%');
+			});
+
+			$('#profile-utilization-modal').on('click', '.modal-footer button.btn-primary', function(e) {
+				var entryId = $('#profile-utilization-modal input[name=entryid]').val();
+				var profile = [];
+				for(var i = 0; i < 24; i++) {
+					var rangeInput = $('#profile-utilization-modal input[type=range]').eq(i);
+					profile.push(parseFloat(rangeInput.val()));
+				}
+				$('#entry-' + entryId + '-input-profileutilization').val(JSON.stringify(profile)).trigger('change');
+				$('#profile-utilization-modal').modal('hide');
 			});
 
 			
@@ -766,6 +1003,7 @@
 				$('.entries > .entry:not(.tpl)', this).each(function(i, el) {
 					var entry = $(el);
 					var entryId = $('> .accordion-collapse', entry).attr('id').replace(/^entry-/, '');
+					var profileUtilizationValue = $('#entry-' + entryId + '-input-profileutilization').val().trim();
 					var device = {
 						name: $('#entry-' + entryId + '-input-name').val().trim(),
 						isSource: entry.closest('.entries').attr('id') == 'entries-power-sources',
@@ -775,11 +1013,24 @@
 						application: $('.input-application:checked', entry).val(),
 						startTime: parseFloat($('#entry-' + entryId + '-input-starttime').val()),
 						endTime: parseFloat($('#entry-' + entryId + '-input-endtime').val()),
-						profile: []
+						profileUtilization: profileUtilizationValue != '' ? JSON.parse(profileUtilizationValue) : [],
+						profileWatts: []
 					};
 					if(device.name == '') device.name = entry.siblings('.tpl').find('> .accordion-header .accordion-button').text().trim();
 					if(isNaN(device.watts)) device.watts = 0;
-					device.profile = getDeviceProfile(device);
+					
+					device.profileUtilization = getDeviceProfileUtilization(device);
+					// console.log(device.profileUtilization);
+					if(device.application != 'custom') {
+						$('#entry-' + entryId + '-input-profileutilization').val(JSON.stringify(device.profileUtilization));
+					}
+					var chartPreview = $('#entry-' + entryId + ' button.customize-profile-utilization .chart');
+					chartPreview.html('');
+					for(var i = 0; i < 24; i++) {
+						chartPreview.append('<span class="bar"><span class="meter" style="height: ' + device.profileUtilization[i] + '%;"></span></span>');
+					}
+
+					device.profileWatts = getDeviceProfileWatts(device);
 					system.push(device);
 				});
 				// console.log(system);
@@ -834,7 +1085,7 @@
 										label: function(context) {
 											if (context.dataset.label == 'Battery SOC') {
 												var label = context.dataset.label + ': ';
-												label += context.parsed.y + '%';
+												label += parseFloat(context.parsed.y).toFixed(2) + '%';
 												return label;
 											}
 											return context.parsed.y;
@@ -907,17 +1158,17 @@
 			var initSOC = parseInt($('#input-initsoc').val());
 
 			var hour = startTime;
-			var currentWh = capacity * initSOC / 100;
+			var currentWh = capacity * (initSOC / 100);
 			for(var i = startTime; i <= dayCount * 24; i++) {
 				if(hour >= 24) hour = 0;
 				if(i == 0) {
-					soc.push(currentWh / capacity);
+					soc.push((currentWh / capacity) * 100);
 				} else {
 					var profileIndex = i - startTime;
 					var netWatts = 0;
 					for(var j in system) {
 						var device = system[j];
-						netWatts += device.profile[profileIndex] * (device.isSource ? 1 : -1);
+						netWatts += device.profileWatts[profileIndex] * (device.isSource ? 1 : -1);
 					}
 					currentWh += netWatts;
 					currentWh = Math.max(0, currentWh);
@@ -938,7 +1189,28 @@
 			return dataSets;
 		}
 
-		function getDeviceProfile(device) {
+		function getDeviceProfileUtilization(device) {
+			var profile = [];
+
+			if(device.application == 'custom') {
+				profile = device.profileUtilization;
+				return profile;
+			}
+
+			for(var i = 0; i < 24; i++) {
+				if(device.application == 'constant') {
+					profile.push(100);
+				} else if(device.application == 'period' && i >= device.startTime && i < device.endTime) {
+					profile.push(100);
+				} else {
+					profile.push(0);
+				}
+			}
+
+			return profile;
+		}
+
+		function getDeviceProfileWatts(device) {
 			var profile = [0];
 
 			var startTime = parseInt($('#input-simstarttime').val());
@@ -947,19 +1219,12 @@
 			var hour = startTime;
 			for(var i = startTime; i <= dayCount * 24; i++) {
 				if(hour >= 24) hour = 0;
-				var watts = device.watts;
-				console.log(device.type);
-				if(device.type == 'solar') {
-					watts = getSolarOutputEfficiency(hour) * device.watts;
-				}
 				if(!device.isActive) {
 					profile.push(0);
-				} else if(device.application == 'constant') {
-					profile.push(watts);
-				} else if(hour >= device.startTime && hour < device.endTime) {
-					profile.push(watts);
 				} else {
-					profile.push(0);
+					var utilization = device.profileUtilization[hour];
+					var watts = (utilization / 100) * device.watts;
+					profile.push(watts);
 				}
 				hour++;
 			}
