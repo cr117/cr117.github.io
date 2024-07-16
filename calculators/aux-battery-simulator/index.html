@@ -1224,8 +1224,14 @@
 			for(var i = 0; i < 24; i++) {
 				if(device.application == 'constant') {
 					profile.push(100);
-				} else if(device.application == 'period' && i >= device.startTime && i < device.endTime) {
-					profile.push(100);
+				} else if(device.application == 'period') {
+					if(i >= device.startTime && i < device.endTime) {
+						profile.push(100);
+					} else if(device.startTime > device.endTime && (i < device.endTime || i >= device.startTime)) {
+						profile.push(100);
+					} else {
+						profile.push(0);
+					}
 				} else {
 					profile.push(0);
 				}
