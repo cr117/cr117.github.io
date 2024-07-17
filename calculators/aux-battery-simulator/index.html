@@ -206,6 +206,16 @@
 				width: 100%;
 				height: auto;
 			}
+			.chart-container::after {
+				content: '';
+				display: block;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 1;
+				position: absolute;
+			}
 			#chart {
 				width: 100% !important;
 				height: 100% !important;
@@ -1134,8 +1144,7 @@
 						application: $('.input-application:checked', entry).val(),
 						startTime: parseFloat($('#entry-' + entryId + '-input-starttime').val()),
 						endTime: parseFloat($('#entry-' + entryId + '-input-endtime').val()),
-						profileUtilization: profileUtilizationValue != '' ? JSON.parse(profileUtilizationValue) : [],
-						profileWatts: []
+						profileUtilization: profileUtilizationValue != '' ? JSON.parse(profileUtilizationValue) : []
 					};
 					if(device.name == '') device.name = entry.siblings('.tpl').find('> .accordion-header .accordion-button').text().trim();
 					if(isNaN(device.watts)) device.watts = 0;
@@ -1151,7 +1160,6 @@
 						chartPreview.append('<span class="bar"><span class="meter" style="height: ' + device.profileUtilization[i] + '%;"></span></span>');
 					}
 
-					device.profileWatts = getDeviceProfileWatts(device);
 					system.push(device);
 				});
 				// console.log(system);
@@ -1282,14 +1290,19 @@
 			var currentWh = capacity * (initSOC / 100);
 			for(var i = startTime; i <= dayCount * 24; i++) {
 				if(hour >= 24) hour = 0;
-				if(i == 0) {
+				if(i == startTime) {
 					soc.push((currentWh / capacity) * 100);
 				} else {
-					var profileIndex = i - startTime;
 					var netWatts = 0;
 					for(var j in system) {
 						var device = system[j];
-						netWatts += device.profileWatts[profileIndex] * (device.isSource ? 1 : -1);
+						if(!device.isActive) {
+							continue;
+						} else {
+							var utilization = device.profileUtilization[hour];
+							var watts = (utilization / 100) * device.watts;
+							netWatts += watts * (device.isSource ? 1 : -1);
+						}
 					}
 					currentWh += netWatts;
 					currentWh = Math.max(0, currentWh);
@@ -1332,28 +1345,6 @@
 				} else {
 					profile.push(0);
 				}
-			}
-
-			return profile;
-		}
-
-		function getDeviceProfileWatts(device) {
-			var profile = [0];
-
-			var startTime = parseInt($('#input-simstarttime').val());
-			var dayCount = parseInt($('#input-days').val());
-
-			var hour = startTime;
-			for(var i = startTime; i <= dayCount * 24; i++) {
-				if(hour >= 24) hour = 0;
-				if(!device.isActive) {
-					profile.push(0);
-				} else {
-					var utilization = device.profileUtilization[hour];
-					var watts = (utilization / 100) * device.watts;
-					profile.push(watts);
-				}
-				hour++;
 			}
 
 			return profile;
