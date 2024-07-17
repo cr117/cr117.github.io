@@ -49,6 +49,10 @@
 			font-weight: 700;
 		}
 
+		.model-loader.disabled {
+			display: none !important;
+		}
+
 		.modal-header .btn-group {
 			margin: 0;
 			margin-left: auto;
@@ -269,9 +273,23 @@
 					</div>
 					<div class="offcanvas-body d-flex flex-column">
 						<div class="flex-grow-1">
+
+							<div class="model-loader d-flex align-items-center mb-2 disabled">
+								<div class="input-group">
+									<select class="form-select" id="input-model-select">
+										<option value="">Select model to load...</option>
+									</select>
+									<button type="button" class="btn btn-secondary" id="btn-load-model">Load</button>
+								</div>
+								<button type="button" class="btn" id="btn-delete-model" title="Delete Model"><i class="bi bi-trash-fill text-danger"></i></button>
+							</div>
 							
+							<div class="mb-5">
+								<button type="button" class="btn btn-primary" id="btn-save-new-model">Save Current Model</button>
+							</div>
+
 							<div>
-								<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#data-import-export-modal">Import/Export Data</button>
+								<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#data-import-export-modal">Import/Export Model Data</button>
 							</div>
 
 						</div>
@@ -906,7 +924,7 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h1 class="modal-title fs-5">Import/Export Data</h1>
+					<h1 class="modal-title fs-5">Import/Export Model Data</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
@@ -933,7 +951,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary">Load Dataset</button>
+					<button type="button" class="btn btn-primary">Load Model Data</button>
 				</div>
 			</div>
 		</div>
@@ -1321,6 +1339,113 @@
 				}
 			});
 
+			var models = getSavedModels();
+			if(models.length) {
+				var input = $('#input-model-select');
+				for(var i in models) {
+					var model = models[i];
+					input.append('<option value="' + model.id + '">' + model.name + '</option>');
+				}
+				input.closest('.model-loader').removeClass('disabled');
+			}
+
+			$('#btn-load-model').on('click', function(e) {
+				var modelId = $('#input-model-select').val();
+				if(!modelId) {
+					alert('Error: Please select a model to load.');
+					return;
+				}
+				var model = null;
+				var models = getSavedModels();
+				for(var i in models) {
+					if(models[i].id == modelId) {
+						model = models[i];
+						break;
+					}
+				}
+				if(!model) {
+					alert('Error: Model not found.');
+					return;
+				}
+				if(confirm('Are you sure you want to replace the current model with the loaded model?')) {
+					if(!loadModelData(model.data)) {
+						alert('Data Parse Error: Model dataset is invalid.');
+					}
+					$('#navbar-offcanvas').offcanvas('hide');
+				}
+			});
+
+			$('#btn-delete-model').on('click', function(e) {
+				var modelId = $('#input-model-select').val();
+				if(!modelId) {
+					alert('Error: Please select a model to delete.');
+					return;
+				}
+				var model = null;
+				var models = getSavedModels();
+				var modelIndex = null;
+				for(var i in models) {
+					if(models[i].id == modelId) {
+						modelIndex = i;
+						model = models[i];
+						break;
+					}
+				}
+				if(!model) {
+					alert('Error: Model not found.');
+					return;
+				}
+				if(confirm('Are you sure you want to delete the model: "' + model.name + '"?')) {
+					models.splice(modelIndex, 1);
+					localStorage.setItem('auxBatterySimModels', JSON.stringify(models));
+
+					var option = $('#input-model-select option[value=' + model.id + ']');
+					option.remove();
+					if($('#input-model-select option').length <= 1) {
+						$('#input-model-select').closest('.model-loader').addClass('disabled');
+					}
+				}
+			});
+
+			$('#btn-save-new-model').on('click', function(e) {
+				var name = prompt('Provide a name for the new model:');
+				if(name === null) return;
+				if(name.trim() == '') {
+					alert('Error: Must provide a name for the model.');
+					return;
+				}
+				var models = getSavedModels();
+				var modelIndex = null;
+				for(var i in models) {
+					if(models[i].name == name) {
+						if(confirm('Are you sure you want to overwrite the model "' + models[i].name + '"?')) {
+							modelIndex = i;
+							break;
+						} else {
+							return;
+						}
+					}
+				}
+				if(modelIndex) {
+					models[modelIndex].data = getModelData();
+					localStorage.setItem('auxBatterySimModels', JSON.stringify(models));
+					$('#input-model-select').val(models[modelIndex].id);
+				} else {
+					var model = {
+						id: 'model-' + Date.now(),
+						name: name,
+						data: getModelData()
+					};
+					models.push(model);
+					localStorage.setItem('auxBatterySimModels', JSON.stringify(models));
+
+					var input = $('#input-model-select');
+					input.append('<option value="' + model.id + '">' + model.name + '</option>');
+					input.val(model.id);
+					input.closest('.model-loader').removeClass('disabled');
+				}
+			});
+
 		});
 
 		function updateQueryParams() {
@@ -1471,7 +1596,6 @@
 		}
 
 		function loadModelData(data) {
-			console.log(data);
 
 			var props = [
 				'volts',
@@ -1507,7 +1631,7 @@
 			$('#input-simstarttime').val(data.startTime);
 			$('#input-initsoc').val(data.initSOC);
 
-			$('.entries > .entry:not(.tpl)', this).remove();
+			$('.entries > .entry:not(.tpl)').remove();
 			for(var i in data.devices) {
 				var device = data.devices[i];
 				var entriesContainer = $('#entries-power-draws');
@@ -1557,6 +1681,14 @@
 
 			$('#calculator').trigger('submit');
 			return true;
+		}
+
+
+		function getSavedModels() {
+			var models = localStorage.getItem('auxBatterySimModels');
+			if(!models) models = '[]';
+			models = JSON.parse(models);
+			return models;
 		}
 
 
