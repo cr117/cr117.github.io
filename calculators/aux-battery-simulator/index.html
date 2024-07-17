@@ -482,7 +482,7 @@
 
 									<div class="d-flex align-items-center justify-content-between">
 										<button type="button" class="btn btn-sm btn-outline-danger remove-entry">Remove Device</button>
-										<span class="avg-watts align-self-end"><span class="value">0.00</span><span class="units">W/<span class="denominator">24hrs</span></span></span>
+										<span class="avg-watts align-self-end"><span class="value">0.000</span><span class="units">kW/<span class="denominator">24hrs</span></span></span>
 									</div>
 
 								</div>
@@ -643,7 +643,7 @@
 
 									<div class="d-flex align-items-center justify-content-between">
 										<button type="button" class="btn btn-sm btn-outline-danger remove-entry">Remove Device</button>
-										<span class="avg-watts align-self-end"><span class="value">0.00</span><span class="units">W/<span class="denominator">24hrs</span></span></span>
+										<span class="avg-watts align-self-end"><span class="value">0.000</span><span class="units">kW/<span class="denominator">24hrs</span></span></span>
 									</div>
 
 								</div>
@@ -911,7 +911,7 @@
 			allDay0:	[	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	],
 			allDay100:	[	100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100	],
 			solar:		[	0,	0,	0,	0,	0,	5,	10,	15,	20,	40,	80,100,100,100,100,	70,	50,	30,	15,	5,	0,	0,	0,	0	],
-			fridge:		[  	10,	10,	10,	15,	15,	15,	20,	30,	40,	45,	50,	50,	50,	50,	50,	45,	45,	40,	35,	30,	25,	20,	15,	15	]
+			fridge:		[  	10,	10,	10,	15,	15,	15,	20,	30,	40,	45,	50,	50,	55,	55,	50,	50,	45,	45,	40,	35,	30,	25,	20,	15	]
 		};
 
 
@@ -1162,8 +1162,8 @@
 						chartPreview.append('<span class="bar"><span class="meter" style="height: ' + device.profileUtilization[i] + '%;"></span></span>');
 						totalUtilization += device.profileUtilization[i];
 					}
-					var avgWatts = (totalUtilization / 100 / 24) * device.watts;
-					$('.avg-watts .value', entry).text(avgWatts.toFixed(2));
+					var avgWatts = (totalUtilization / 100) * device.watts;
+					$('.avg-watts .value', entry).text((avgWatts / 1000).toFixed(3));
 
 					system.push(device);
 				});
