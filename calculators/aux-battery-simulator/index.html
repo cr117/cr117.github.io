@@ -1312,11 +1312,13 @@
 					alert('Data Parse Error: Unable to parse model dataset.');
 				}
 				if(!data) return;
-				if(!loadModelData(data)) {
-					alert('Data Parse Error: Model dataset is invalid.');
+				if(confirm('Are you sure you want to replace the current model with the dataset provided?')) {
+					if(!loadModelData(data)) {
+						alert('Data Parse Error: Model dataset is invalid.');
+					}
+					$('#data-import-export-modal').modal('hide');
+					$('#navbar-offcanvas').offcanvas('hide');
 				}
-				$('#data-import-export-modal').modal('hide');
-				$('#navbar-offcanvas').offcanvas('hide');
 			});
 
 		});
