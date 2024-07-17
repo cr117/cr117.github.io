@@ -157,6 +157,19 @@
 		.entry button.customize-profile-utilization:hover .chart .bar .meter {
 			background-color: rgba(255,255,255,1);
 		}
+		.entry .avg-watts {
+			font-size: .75rem;
+			opacity: .75;
+		}
+		.entry .avg-watts .value {
+			font-weight: 700;
+		}
+		.entry .avg-watts .units {
+			opacity: .5;
+		}
+		.entry .avg-watts .units .denominator {
+			font-size: .6rem;
+		}
 
 		.form-floating .form-select.form-select-sm ~ label {
 			padding: 1rem .5rem;
@@ -467,8 +480,9 @@
 										</div>
 									</div>
 
-									<div>
+									<div class="d-flex align-items-center justify-content-between">
 										<button type="button" class="btn btn-sm btn-outline-danger remove-entry">Remove Device</button>
+										<span class="avg-watts align-self-end"><span class="value">0.00</span><span class="units">W/<span class="denominator">24hrs</span></span></span>
 									</div>
 
 								</div>
@@ -627,8 +641,9 @@
 										</div>
 									</div>
 
-									<div>
+									<div class="d-flex align-items-center justify-content-between">
 										<button type="button" class="btn btn-sm btn-outline-danger remove-entry">Remove Device</button>
+										<span class="avg-watts align-self-end"><span class="value">0.00</span><span class="units">W/<span class="denominator">24hrs</span></span></span>
 									</div>
 
 								</div>
@@ -1134,31 +1149,21 @@
 				$('.entries > .entry:not(.tpl)', this).each(function(i, el) {
 					var entry = $(el);
 					var entryId = $('> .accordion-collapse', entry).attr('id').replace(/^entry-/, '');
-					var profileUtilizationValue = $('#entry-' + entryId + '-input-profileutilization').val().trim();
-					var device = {
-						name: $('#entry-' + entryId + '-input-name').val().trim(),
-						isSource: entry.closest('.entries').attr('id') == 'entries-power-sources',
-						type: $('#entry-' + entryId + '-input-type').val(),
-						isActive: $('#entry-' + entryId + '-input-active').is(':checked'),
-						watts: parseFloat($('#entry-' + entryId + '-input-watts').val()),
-						application: $('.input-application:checked', entry).val(),
-						startTime: parseFloat($('#entry-' + entryId + '-input-starttime').val()),
-						endTime: parseFloat($('#entry-' + entryId + '-input-endtime').val()),
-						profileUtilization: profileUtilizationValue != '' ? JSON.parse(profileUtilizationValue) : []
-					};
-					if(device.name == '') device.name = entry.siblings('.tpl').find('> .accordion-header .accordion-button').text().trim();
-					if(isNaN(device.watts)) device.watts = 0;
-					
-					device.profileUtilization = getDeviceProfileUtilization(device);
+					var device = getDevice(entry);
+
 					// console.log(device.profileUtilization);
 					if(device.application != 'custom') {
 						$('#entry-' + entryId + '-input-profileutilization').val(JSON.stringify(device.profileUtilization));
 					}
 					var chartPreview = $('#entry-' + entryId + ' button.customize-profile-utilization .chart');
 					chartPreview.html('');
+					var totalUtilization = 0;
 					for(var i = 0; i < 24; i++) {
 						chartPreview.append('<span class="bar"><span class="meter" style="height: ' + device.profileUtilization[i] + '%;"></span></span>');
+						totalUtilization += device.profileUtilization[i];
 					}
+					var avgWatts = (totalUtilization / 100 / 24) * device.watts;
+					$('.avg-watts .value', entry).text(avgWatts.toFixed(2));
 
 					system.push(device);
 				});
@@ -1321,6 +1326,26 @@
 			}];
 
 			return dataSets;
+		}
+
+		function getDevice(entry) {
+			var entryId = $('> .accordion-collapse', entry).attr('id').replace(/^entry-/, '');
+			var profileUtilizationValue = $('#entry-' + entryId + '-input-profileutilization').val().trim();
+			var device = {
+				name: $('#entry-' + entryId + '-input-name').val().trim(),
+				isSource: entry.closest('.entries').attr('id') == 'entries-power-sources',
+				type: $('#entry-' + entryId + '-input-type').val(),
+				isActive: $('#entry-' + entryId + '-input-active').is(':checked'),
+				watts: parseFloat($('#entry-' + entryId + '-input-watts').val()),
+				application: $('.input-application:checked', entry).val(),
+				startTime: parseFloat($('#entry-' + entryId + '-input-starttime').val()),
+				endTime: parseFloat($('#entry-' + entryId + '-input-endtime').val()),
+				profileUtilization: profileUtilizationValue != '' ? JSON.parse(profileUtilizationValue) : []
+			};
+			if(device.name == '') device.name = entry.siblings('.tpl').find('> .accordion-header .accordion-button').text().trim();
+			if(isNaN(device.watts)) device.watts = 0;
+			device.profileUtilization = getDeviceProfileUtilization(device);
+			return device;
 		}
 
 		function getDeviceProfileUtilization(device) {
