@@ -936,7 +936,7 @@
 				var mode = $('#input-wh').siblings('.btn-secondary').data('input-toggle');
 				if(mode == 'ah') {
 					var ah = parseFloat($('#input-ah').val());
-					$('#input-wh').val(volts * ah);
+					$('#input-wh').val((volts * ah).toFixed(2));
 				} else if(mode == 'wh') {
 					var wh = parseFloat($('#input-wh').val());
 					$('#input-ah').val((wh / volts).toFixed(2));
@@ -946,7 +946,7 @@
 					var mode = $('input.input-mode', entry).val();
 					if(mode == 'amps') {
 						var amps = parseFloat($('input.input-amps', entry).val());
-						$('input.input-watts', entry).val(volts * amps);
+						$('input.input-watts', entry).val((volts * amps).toFixed(2));
 					} else if(mode == 'watts') {
 						var watts = parseFloat($('input.input-watts', entry).val());
 						$('input.input-amps', entry).val((watts / volts).toFixed(2));
@@ -1054,7 +1054,7 @@
 
 				if(mode == 'amps' && $(this).hasClass('input-amps')) {
 					var amps = parseFloat($('input.input-amps', entry).val());
-					$('input.input-watts', entry).val(volts * amps).trigger('change', false);
+					$('input.input-watts', entry).val((volts * amps).toFixed(2)).trigger('change', false);
 				} else if(mode == 'watts' && $(this).hasClass('input-watts')) {
 					var watts = parseFloat($('input.input-watts', entry).val());
 					$('input.input-amps', entry).val((watts / volts).toFixed(2));
